@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import ChevronLogo from '@/components/shared/ChevronLogo';
+import { githubUrl } from '@/lib/github';
 import { home } from '@/routes';
 
 export default function GhostCardState({ username }: { username: string }) {
@@ -13,7 +14,15 @@ export default function GhostCardState({ username }: { username: string }) {
                         NOT ENOUGH SIGNAL
                     </span>
                     <span className="font-display text-2xl leading-snug font-bold text-fg-2 uppercase">
-                        No card struck for @{username}
+                        No card struck for{' '}
+                        <a
+                            href={githubUrl(username)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-fg-1 hover:text-live-400"
+                        >
+                            @{username}
+                        </a>
                     </span>
                     <span className="text-sm leading-relaxed text-fg-3">
                         Not enough public activity to rate. Push some public

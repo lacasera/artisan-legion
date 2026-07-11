@@ -1,4 +1,6 @@
+import type { KeyboardEvent } from 'react';
 import type { LegionPlayer } from '@/components/legion/types';
+import { githubUrl } from '@/lib/github';
 import { cn } from '@/lib/utils';
 
 export default function ReservesList({
@@ -24,12 +26,27 @@ export default function ReservesList({
                     const clickable = player.breakdown !== null;
 
                     return (
-                        <button
+                        <div
                             key={player.id}
-                            type="button"
-                            disabled={!clickable}
+                            role={clickable ? 'button' : undefined}
+                            tabIndex={clickable ? 0 : undefined}
                             onClick={
                                 clickable ? () => onSelect(player) : undefined
+                            }
+                            onKeyDown={
+                                clickable
+                                    ? (
+                                          event: KeyboardEvent<HTMLDivElement>,
+                                      ) => {
+                                          if (
+                                              event.key === 'Enter' ||
+                                              event.key === ' '
+                                          ) {
+                                              event.preventDefault();
+                                              onSelect(player);
+                                          }
+                                      }
+                                    : undefined
                             }
                             className={cn(
                                 'grid grid-cols-[44px_1fr_52px_80px] items-center gap-2 border-b border-line-1 px-4 py-[11px] text-left',
@@ -40,16 +57,22 @@ export default function ReservesList({
                             <span className="font-mono text-[15px] font-bold text-fg-1">
                                 {player.ovr}
                             </span>
-                            <span className="truncate font-mono text-xs text-fg-2">
+                            <a
+                                href={githubUrl(player.handle)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(event) => event.stopPropagation()}
+                                className="block truncate font-mono text-xs text-fg-2 hover:text-live-400"
+                            >
                                 @{player.handle}
-                            </span>
+                            </a>
                             <span className="font-mono text-[11px] font-semibold tracking-[0.06em] text-fg-3">
                                 {player.pos}
                             </span>
                             <span className="text-right font-mono text-[11px] text-fg-4">
                                 {player.topLanguage}
                             </span>
-                        </button>
+                        </div>
                     );
                 })}
             </div>

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { LegionPlayer } from '@/components/legion/types';
 import { formatPoints } from '@/lib/format';
+import { githubUrl } from '@/lib/github';
 import { cn } from '@/lib/utils';
 import { show as cardsShow } from '@/routes/cards';
 
@@ -40,7 +41,15 @@ export default function PlayerBreakdownPanel({
                             {breakdown.ovr}
                         </span>
                         <span className="font-mono text-xs text-live-500">
-                            @{player.handle} · {breakdown.position}
+                            <a
+                                href={githubUrl(player.handle)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-live-400"
+                            >
+                                @{player.handle}
+                            </a>{' '}
+                            · {breakdown.position}
                         </span>
                     </div>
                     <Link

@@ -1,4 +1,5 @@
 import type { LegionCaptain } from '@/components/legion/types';
+import { githubUrl } from '@/lib/github';
 
 export default function CaptainCard({ captain }: { captain: LegionCaptain }) {
     return (
@@ -15,7 +16,15 @@ export default function CaptainCard({ captain }: { captain: LegionCaptain }) {
                         {captain.name}
                     </span>
                     <span className="font-mono text-xs text-live-500">
-                        @{captain.handle} · {captain.pos}
+                        <a
+                            href={githubUrl(captain.handle)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-live-400"
+                        >
+                            @{captain.handle}
+                        </a>{' '}
+                        · {captain.pos}
                     </span>
                     <span className="font-mono text-[11px] text-fg-4">
                         highest-rated soldier in the legion

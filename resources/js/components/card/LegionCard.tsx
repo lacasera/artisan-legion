@@ -2,6 +2,7 @@ import CardEditionStrip from '@/components/card/CardEditionStrip';
 import CardHeader from '@/components/card/CardHeader';
 import CardStats from '@/components/card/CardStats';
 import type { LegionCardProps } from '@/components/card/types';
+import { githubUrl } from '@/lib/github';
 import { cn } from '@/lib/utils';
 
 export default function LegionCard({ dev, foil = true }: LegionCardProps) {
@@ -37,7 +38,7 @@ export default function LegionCard({ dev, foil = true }: LegionCardProps) {
                     {dev.name}
                 </span>
                 <a
-                    href={`https://github.com/${dev.handle}`}
+                    href={githubUrl(dev.handle)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="self-center font-mono text-[13px] font-medium text-live-500 hover:text-live-400"

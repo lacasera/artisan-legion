@@ -1,5 +1,7 @@
+import type { KeyboardEvent } from 'react';
 import type { PlayerChipProps } from '@/components/legion/types';
 import FlagChip from '@/components/shared/FlagChip';
+import { githubUrl } from '@/lib/github';
 import { flagCssFor } from '@/lib/nations';
 import { cn } from '@/lib/utils';
 
@@ -11,11 +13,25 @@ export default function PlayerChip({
     const clickable = player.breakdown !== null && onSelect !== undefined;
     const flag = flagCssFor(player.countryCode);
 
+    function select() {
+        if (clickable) {
+            onSelect(player);
+        }
+    }
+
+    function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+        if (clickable && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            onSelect(player);
+        }
+    }
+
     return (
-        <button
-            type="button"
-            disabled={!clickable}
-            onClick={clickable ? () => onSelect(player) : undefined}
+        <div
+            role={clickable ? 'button' : undefined}
+            tabIndex={clickable ? 0 : undefined}
+            onClick={select}
+            onKeyDown={onKeyDown}
             className={cn(
                 'relative flex w-24 flex-col items-center gap-1.5 rounded-sm border px-2 py-3 text-left lg:w-32',
                 player.captain
@@ -56,12 +72,18 @@ export default function PlayerChip({
                     {player.pos}
                 </span>
             </div>
-            <span className="max-w-20 truncate font-mono text-[11px] text-fg-1 lg:max-w-28">
+            <a
+                href={githubUrl(player.handle)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => event.stopPropagation()}
+                className="block max-w-20 truncate font-mono text-[11px] text-fg-1 hover:text-live-400 lg:max-w-28"
+            >
                 @{player.handle}
-            </span>
+            </a>
             <span className="font-mono text-[10px] tracking-[0.06em] text-fg-4">
                 {player.topLanguage}
             </span>
-        </button>
+        </div>
     );
 }

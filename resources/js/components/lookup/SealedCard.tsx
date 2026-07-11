@@ -1,4 +1,5 @@
 import ChevronLogo from '@/components/shared/ChevronLogo';
+import { githubUrl } from '@/lib/github';
 
 export default function SealedCard({ username }: { username: string }) {
     return (
@@ -21,7 +22,15 @@ export default function SealedCard({ username }: { username: string }) {
                 <div className="absolute inset-0 rounded-xl shadow-[inset_0_0_40px_rgba(33,224,196,0.06)]" />
             </div>
             <span className="font-mono text-xs tracking-[0.08em] text-fg-3">
-                @{username} · 2,341 events found
+                <a
+                    href={githubUrl(username)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-fg-1"
+                >
+                    @{username}
+                </a>{' '}
+                · 2,341 events found
             </span>
         </div>
     );

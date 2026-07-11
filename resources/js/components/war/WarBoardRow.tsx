@@ -1,6 +1,7 @@
 import FlagChip from '@/components/shared/FlagChip';
 import type { WarBoardRowProps } from '@/components/war/types';
 import { formatPoints } from '@/lib/format';
+import { githubUrl } from '@/lib/github';
 import { flagCssFor, nationNameFor } from '@/lib/nations';
 import { cn } from '@/lib/utils';
 
@@ -40,7 +41,15 @@ export default function WarBoardRow({ entry, gain }: WarBoardRowProps) {
                     )}
                 </div>
                 <span className="font-mono text-[11px] text-fg-4">
-                    top soldier @{entry.topSoldier}
+                    top soldier{' '}
+                    <a
+                        href={githubUrl(entry.topSoldier)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-fg-2"
+                    >
+                        @{entry.topSoldier}
+                    </a>
                 </span>
             </div>
             <div className="hidden h-[5px] overflow-hidden rounded-full bg-ink-700 lg:block">

@@ -3,6 +3,7 @@ import type { LegionSummary } from '@/components/legion/types';
 import FlagChip from '@/components/shared/FlagChip';
 import TopNav from '@/components/shared/TopNav';
 import { formatPoints } from '@/lib/format';
+import { githubUrl } from '@/lib/github';
 import { flagCssFor, nationNameFor } from '@/lib/nations';
 import { cn } from '@/lib/utils';
 import { show as legionsShow } from '@/routes/legions';
@@ -36,11 +37,15 @@ export default function LegionsIndex({
                 ) : (
                     <div className="flex flex-col">
                         {legions.map((legion, index) => (
-                            <Link
+                            <div
                                 key={legion.code}
-                                href={legionsShow(legion.code)}
-                                className="grid grid-cols-[56px_56px_1fr_120px] items-center gap-4 border-b border-line-1 px-6 py-4 hover:bg-ink-850 lg:grid-cols-[72px_56px_1fr_170px_150px] lg:px-12"
+                                className="relative grid grid-cols-[56px_56px_1fr_120px] items-center gap-4 border-b border-line-1 px-6 py-4 hover:bg-ink-850 lg:grid-cols-[72px_56px_1fr_170px_150px] lg:px-12"
                             >
+                                <Link
+                                    href={legionsShow(legion.code)}
+                                    aria-label={`${nationNameFor(legion.code)} legion`}
+                                    className="absolute inset-0 z-10"
+                                />
                                 <span
                                     className={cn(
                                         'font-display text-[22px] font-bold',
@@ -57,7 +62,15 @@ export default function LegionsIndex({
                                         {nationNameFor(legion.code)}
                                     </span>
                                     <span className="font-mono text-[11px] text-fg-4">
-                                        top soldier @{legion.topSoldier}
+                                        top soldier{' '}
+                                        <a
+                                            href={githubUrl(legion.topSoldier)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="relative z-20 hover:text-fg-2"
+                                        >
+                                            @{legion.topSoldier}
+                                        </a>
                                     </span>
                                 </div>
                                 <span className="hidden text-right font-mono text-xs text-fg-3 lg:block">
@@ -69,7 +82,7 @@ export default function LegionsIndex({
                                 <span className="text-right font-mono text-lg font-bold text-fg-1">
                                     {legion.averageOvr}
                                 </span>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 )}
