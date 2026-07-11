@@ -10,6 +10,7 @@ class GitHubProfileData extends Data
 {
     /**
      * @param  array<string, array{bytes: int, stars: int, recent: bool}>  $languages
+     * @param  list<string>  $frameworks
      */
     public function __construct(
         public string $login,
@@ -20,5 +21,6 @@ class GitHubProfileData extends Data
         public int $totalContributions,
         public int $totalStars,
         public array $languages,
+        public array $frameworks = [],
     ) {}
 }

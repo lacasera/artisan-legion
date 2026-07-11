@@ -25,6 +25,28 @@ it('fetches_and_aggregates_a_profile', function () {
         ->and($profile->languages['Shell']['stars'])->toBe(0);
 });
 
+it('infers_frameworks_from_dependency_manifests_ordered_by_repo_count', function () {
+    Http::fake(['api.github.com/graphql' => Http::response(githubUserResponse())]);
+
+    $profile = app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell');
+
+    expect($profile->frameworks)->toBe(['LARAVEL', 'LIVEWIRE', 'TAILWIND']);
+});
+
+it('handles_missing_or_malformed_manifests', function () {
+    Http::fake([
+        'api.github.com/graphql' => Http::response(githubUserResponse([
+            'manifests' => [
+                'nodes' => [
+                    ['composerJson' => null, 'packageJson' => ['text' => 'not-json{{']],
+                ],
+            ],
+        ])),
+    ]);
+
+    expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->frameworks)->toBe([]);
+});
+
 it('counts_only_public_contributions', function () {
     Http::fake([
         'api.github.com/graphql' => Http::response(githubUserResponse([

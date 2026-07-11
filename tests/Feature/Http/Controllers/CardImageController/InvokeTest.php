@@ -18,3 +18,14 @@ it('streams_the_rendered_card_png', function () {
         ->assertOk()
         ->assertHeader('Content-Type', 'image/png');
 });
+
+it('serves_the_fallback_banner_when_rendering_fails', function () {
+    $this->mock(CardImageService::class)
+        ->shouldReceive('imageFor')
+        ->once()
+        ->andThrow(new RuntimeException('chrome exploded'));
+
+    $this->get(route('cards.image', ['username' => 'taylorotwell']))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'image/png');
+});

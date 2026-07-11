@@ -23,12 +23,17 @@ class CardImageService
             mkdir(dirname($path), 0755, true);
         }
 
-        Browsershot::url(route('cards.show', ['username' => $username]))
+        $browsershot = Browsershot::url(route('cards.show', ['username' => $username]))
             ->windowSize(1280, 900)
             ->deviceScaleFactor(2)
             ->waitUntilNetworkIdle()
-            ->select('[data-card-frame]')
-            ->save($path);
+            ->select('[data-card-frame]');
+
+        if (config('services.browsershot.no_sandbox')) {
+            $browsershot->noSandbox();
+        }
+
+        $browsershot->save($path);
 
         return $path;
     }

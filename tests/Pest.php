@@ -53,7 +53,8 @@ expect()->extend('toBeOne', function () {
 function githubUserResponse(array $overrides = []): array
 {
     $repositories = $overrides['repositories'] ?? null;
-    unset($overrides['repositories']);
+    $manifests = $overrides['manifests'] ?? null;
+    unset($overrides['repositories'], $overrides['manifests']);
 
     $user = array_replace_recursive([
         'login' => 'taylorotwell',
@@ -89,10 +90,26 @@ function githubUserResponse(array $overrides = []): array
                 ],
             ],
         ],
+        'manifests' => [
+            'nodes' => [
+                [
+                    'composerJson' => ['text' => json_encode(['require' => ['laravel/framework' => '^13.0', 'livewire/livewire' => '^4.0']])],
+                    'packageJson' => ['text' => json_encode(['dependencies' => ['tailwindcss' => '^4.0']])],
+                ],
+                [
+                    'composerJson' => ['text' => json_encode(['require' => ['laravel/framework' => '^12.0']])],
+                    'packageJson' => null,
+                ],
+            ],
+        ],
     ], $overrides);
 
     if ($repositories !== null) {
         $user['repositories'] = $repositories;
+    }
+
+    if ($manifests !== null) {
+        $user['manifests'] = $manifests;
     }
 
     return ['data' => ['user' => $user]];

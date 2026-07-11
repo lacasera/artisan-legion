@@ -5,7 +5,7 @@ import { home } from '@/routes';
 export default function GhostCardState({ username }: { username: string }) {
     return (
         <div className="flex flex-col items-center gap-6">
-            <div className="relative flex h-[560px] w-[400px] flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-dashed border-ink-600 bg-ink-900">
+            <div className="relative flex h-[560px] w-[400px] origin-top scale-[0.85] flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-dashed border-ink-600 bg-ink-900 not-sm:-mb-[84px] sm:scale-100">
                 <div className="absolute inset-0 chevron-field opacity-40" />
                 <div className="relative flex flex-col items-center gap-5 px-10 text-center">
                     <ChevronLogo size={72} color="#2A3040" strokeWidth={1.6} />

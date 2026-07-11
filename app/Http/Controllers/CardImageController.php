@@ -11,7 +11,15 @@ class CardImageController extends Controller
 {
     public function __invoke(CardImageService $cardImageService, string $username): BinaryFileResponse
     {
-        return response()->file($cardImageService->imageFor($username), [
+        try {
+            $path = $cardImageService->imageFor($username);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            $path = public_path('images/og-fallback.png');
+        }
+
+        return response()->file($path, [
             'Content-Type' => 'image/png',
             'Cache-Control' => 'public, max-age=3600',
         ]);

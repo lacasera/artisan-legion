@@ -48,7 +48,7 @@ export default function CardsShow({ username, dev }: CardsShowProps) {
                             </span>
                             <div
                                 data-card-frame
-                                className="drop-shadow-[0_32px_48px_rgba(0,0,0,0.6)]"
+                                className="origin-top scale-[0.85] drop-shadow-[0_32px_48px_rgba(0,0,0,0.6)] not-sm:-mb-[84px] sm:scale-100"
                             >
                                 <LegionCard dev={card} />
                             </div>

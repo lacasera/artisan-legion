@@ -91,6 +91,15 @@ Every screen is built against DTO contracts fed by a mock provider. Later phases
 - [ ] Clip caption names: scale-to-zero ($0 idle, ~500ms wake), managed queues polling commits, scheduler running the weekly league (Reverb dropped — don't claim it in the caption)
 - [ ] Post submission
 
+## Ship-readiness (Saturday, pre-deploy) ✅
+
+- [x] Abuse hardening: GitHub-username + legion-code route patterns (404 before controllers), per-IP rate limits (lookup 10/min, cards 30/min)
+- [x] Git repo pushed to `lacasera/artisan-legion` (Cloud deploys from GitHub)
+- [x] Themed error pages: `error.tsx` (404/419/429 always, 500/503 in production) via `withExceptions` respond hook
+- [x] Mobile sweep at 390px: card/sealed/ghost scale wrappers, pitch + chips resize, war board 4-column mobile grid, hero headline/form fixes
+- [x] PNG insurance: `og-fallback.png` sealed-card banner served when Browsershot fails; `BROWSERSHOT_NO_SANDBOX` env flag for Cloud
+- [x] Open-source-only counting: `restrictedContributionsCount` subtracted everywhere (ratings + war points)
+
 ## Stretch (only if everything above is done)
 
-- [ ] Framework inference from dependency files (`composer.json` → Laravel, `package.json` → React)
+- [x] Framework inference from dependency manifests (`composer.json`/`package.json` blobs in the same GraphQL query) → up to 3 display chips on the card (LARAVEL/REACT/VUE/TAILWIND/…); display-only, never rating input

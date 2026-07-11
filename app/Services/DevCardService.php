@@ -73,6 +73,7 @@ class DevCardService
                     'contributions' => $profile->totalContributions,
                     'stars' => $profile->totalStars,
                     'languages' => $profile->languages,
+                    'frameworks' => $profile->frameworks,
                 ],
                 'last_refreshed_at' => now(),
             ],

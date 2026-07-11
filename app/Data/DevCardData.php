@@ -14,6 +14,7 @@ class DevCardData extends Data
 {
     /**
      * @param  DataCollection<int, LanguageStatData>  $stats
+     * @param  list<string>  $frameworks
      */
     public function __construct(
         public string $id,
@@ -28,6 +29,7 @@ class DevCardData extends Data
         public bool $specialist,
         #[DataCollectionOf(LanguageStatData::class)]
         public DataCollection $stats,
+        public array $frameworks = [],
     ) {}
 
     public static function fromDev(Dev $dev, string $rankLabel): self
@@ -50,6 +52,7 @@ class DevCardData extends Data
                 )),
                 DataCollection::class,
             ),
+            frameworks: array_values((array) data_get($dev->raw_stats, 'frameworks', [])),
         );
     }
 }

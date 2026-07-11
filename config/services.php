@@ -18,6 +18,10 @@ return [
         'token' => env('GITHUB_TOKEN'),
     ],
 
+    'browsershot' => [
+        'no_sandbox' => env('BROWSERSHOT_NO_SANDBOX', false),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

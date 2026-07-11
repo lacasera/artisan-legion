@@ -3,7 +3,10 @@ import ChevronLogo from '@/components/shared/ChevronLogo';
 export default function SealedCard({ username }: { username: string }) {
     return (
         <div className="relative flex flex-col items-center gap-6">
-            <div className="relative h-[560px] w-[400px] overflow-hidden rounded-xl border border-ink-600 bg-ink-900 shadow-[0_32px_64px_rgba(0,0,0,0.6)]">
+            <div
+                data-sealed-card
+                className="relative h-[560px] w-[400px] origin-top scale-[0.85] overflow-hidden rounded-xl border border-ink-600 bg-ink-900 shadow-[0_32px_64px_rgba(0,0,0,0.6)] not-sm:-mb-[84px] sm:scale-100"
+            >
                 <div className="absolute inset-0 chevron-field" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
                     <ChevronLogo size={96} strokeWidth={1.6} />

@@ -5,7 +5,7 @@ export default function PlayerChip({ player }: PlayerChipProps) {
     return (
         <div
             className={cn(
-                'relative flex w-32 flex-col items-center gap-1.5 rounded-sm border px-2 py-3',
+                'relative flex w-24 flex-col items-center gap-1.5 rounded-sm border px-2 py-3 lg:w-32',
                 player.captain
                     ? 'border-cue-500/45 bg-cue-500/6'
                     : 'border-line-2 bg-ink-800',
@@ -29,7 +29,7 @@ export default function PlayerChip({ player }: PlayerChipProps) {
                     {player.pos}
                 </span>
             </div>
-            <span className="max-w-28 truncate font-mono text-[11px] text-fg-1">
+            <span className="max-w-20 truncate font-mono text-[11px] text-fg-1 lg:max-w-28">
                 @{player.handle}
             </span>
             <span className="font-mono text-[10px] tracking-[0.06em] text-fg-4">

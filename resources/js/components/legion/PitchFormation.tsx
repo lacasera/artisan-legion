@@ -20,18 +20,18 @@ export default function PitchFormation({ legion }: { legion: Legion }) {
                     AVG OVR {legion.averageOvr}
                 </span>
             </div>
-            <div className="relative h-[880px] overflow-hidden rounded-lg border border-white/9 bg-ink-850">
+            <div className="relative h-[640px] overflow-hidden rounded-lg border border-white/9 bg-ink-850 lg:h-[880px]">
                 <div className="absolute inset-x-0 top-1/2 h-px bg-white/8" />
                 <div className="absolute top-1/2 left-1/2 size-[140px] -translate-1/2 rounded-full border border-white/8" />
                 <div className="absolute -top-px left-1/2 h-[90px] w-[300px] -translate-x-1/2 border border-t-0 border-white/8" />
                 <div className="absolute -bottom-px left-1/2 h-[90px] w-[300px] -translate-x-1/2 border border-b-0 border-white/8" />
-                <div className="absolute inset-0 flex flex-col justify-between px-8 py-11">
+                <div className="absolute inset-0 flex flex-col justify-between px-3 py-6 lg:px-8 lg:py-11">
                     <div className="flex justify-around">
                         {legion.attack.map((player) => (
                             <PlayerChip key={player.id} player={player} />
                         ))}
                     </div>
-                    <div className="flex justify-around px-15">
+                    <div className="flex justify-around px-4 lg:px-15">
                         {legion.midfield.map((player) => (
                             <PlayerChip key={player.id} player={player} />
                         ))}

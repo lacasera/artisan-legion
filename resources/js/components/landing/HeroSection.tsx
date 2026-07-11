@@ -10,8 +10,8 @@ export default function HeroSection({
     soldierCount: number;
 }) {
     return (
-        <div className="relative grid items-center gap-10 px-6 py-16 lg:grid-cols-[1fr_560px] lg:px-10 lg:pt-[72px]">
-            <div className="flex max-w-[620px] flex-col gap-7">
+        <div className="relative grid grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-[1fr_560px] lg:px-10 lg:pt-[72px]">
+            <div className="flex max-w-[620px] min-w-0 flex-col gap-7">
                 <div className="flex items-center gap-2.5">
                     <span className="h-px w-6 bg-fg-3" />
                     <span className="-ml-2.5 size-[5px] rounded-full bg-signal-500" />
@@ -20,7 +20,7 @@ export default function HeroSection({
                         {soldierCount === 1 ? 'SOLDIER' : 'SOLDIERS'} ENLISTED
                     </span>
                 </div>
-                <h1 className="font-display text-6xl leading-[0.94] font-bold tracking-[-0.015em] uppercase lg:text-[88px]">
+                <h1 className="font-display text-[44px] leading-[0.94] font-bold tracking-[-0.015em] uppercase sm:text-6xl lg:text-[88px]">
                     Your commits
                     <br />
                     have a rating.

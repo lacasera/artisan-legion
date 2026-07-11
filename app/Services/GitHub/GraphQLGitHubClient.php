@@ -37,9 +37,34 @@ class GraphQLGitHubClient implements GitHubClient
                         }
                     }
                 }
+                manifests: repositories(first: 8, ownerAffiliations: OWNER, isFork: false, orderBy: {field: STARGAZERS, direction: DESC}) {
+                    nodes {
+                        composerJson: object(expression: "HEAD:composer.json") {
+                            ... on Blob { text }
+                        }
+                        packageJson: object(expression: "HEAD:package.json") {
+                            ... on Blob { text }
+                        }
+                    }
+                }
             }
         }
         GRAPHQL;
+
+    private const array FRAMEWORK_MAP = [
+        'laravel/framework' => 'LARAVEL',
+        'livewire/livewire' => 'LIVEWIRE',
+        'symfony/framework-bundle' => 'SYMFONY',
+        'react' => 'REACT',
+        'vue' => 'VUE',
+        'next' => 'NEXT.JS',
+        'nuxt' => 'NUXT',
+        'svelte' => 'SVELTE',
+        '@angular/core' => 'ANGULAR',
+        'tailwindcss' => 'TAILWIND',
+        'express' => 'EXPRESS',
+        'alpinejs' => 'ALPINE',
+    ];
 
     private const string CONTRIBUTIONS_QUERY = <<<'GRAPHQL'
         query DevContributions($login: String!) {
@@ -73,7 +98,59 @@ class GraphQLGitHubClient implements GitHubClient
             totalContributions: $this->publicContributions($user),
             totalStars: (int) collect($repositories)->sum('stargazerCount'),
             languages: $this->aggregateLanguages($repositories),
+            frameworks: $this->inferFrameworks($user),
         );
+    }
+
+    /**
+     * Frameworks are display chips only — never rating inputs. Each counts
+     * once per repo; the three most widespread win.
+     *
+     * @return list<string>
+     */
+    private function inferFrameworks(mixed $user): array
+    {
+        $counts = [];
+
+        foreach ((array) data_get($user, 'manifests.nodes', []) as $node) {
+            $dependencies = [];
+
+            foreach (['composerJson', 'packageJson'] as $key) {
+                $text = data_get($node, $key.'.text');
+
+                if (! is_string($text)) {
+                    continue;
+                }
+
+                $manifest = json_decode($text, true);
+
+                if (! is_array($manifest)) {
+                    continue;
+                }
+
+                foreach (['require', 'require-dev', 'dependencies', 'devDependencies'] as $section) {
+                    $dependencies = [...$dependencies, ...array_keys((array) ($manifest[$section] ?? []))];
+                }
+            }
+
+            $repoFrameworks = [];
+
+            foreach ($dependencies as $dependency) {
+                $label = self::FRAMEWORK_MAP[$dependency] ?? null;
+
+                if ($label !== null) {
+                    $repoFrameworks[$label] = true;
+                }
+            }
+
+            foreach (array_keys($repoFrameworks) as $label) {
+                $counts[$label] = ($counts[$label] ?? 0) + 1;
+            }
+        }
+
+        arsort($counts);
+
+        return array_slice(array_keys($counts), 0, 3);
     }
 
     public function fetchContributionCount(string $username): ?int

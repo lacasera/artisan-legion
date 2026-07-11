@@ -16,6 +16,7 @@ export interface CardDev {
     serial: string;
     specialist?: boolean;
     stats: CardStat[];
+    frameworks?: string[];
 }
 
 export interface ServerCardDev extends Omit<CardDev, 'flagCss' | 'initials'> {

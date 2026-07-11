@@ -21,5 +21,6 @@ export const MOCK_DEVS: Record<string, CardDev> = {
             { name: 'BLADE', val: 81 },
             { name: 'CSS', val: 74 },
         ],
+        frameworks: ['LARAVEL', 'TAILWIND'],
     },
 };

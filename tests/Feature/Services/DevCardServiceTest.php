@@ -20,6 +20,7 @@ it('strikes_a_card_and_persists_the_dev_with_languages', function () {
     expect($card->id)->toBe($dev->public_id)
         ->and($card->handle)->toBe('taylorotwell')
         ->and($card->name)->toBe('TAYLOR OTWELL')
+        ->and($card->frameworks)->toBe(['LARAVEL', 'LIVEWIRE', 'TAILWIND'])
         ->and($card->nation)->toBe('USA')
         ->and($card->rankLabel)->toBe('USA · NAT #1')
         ->and($card->serial)->toBe(str_pad((string) $dev->id, 5, '0', STR_PAD_LEFT))

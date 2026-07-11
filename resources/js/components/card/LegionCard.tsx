@@ -44,6 +44,18 @@ export default function LegionCard({ dev, foil = true }: LegionCardProps) {
                 >
                     @{dev.handle}
                 </a>
+                {dev.frameworks && dev.frameworks.length > 0 && (
+                    <div className="mt-1 flex justify-center gap-1.5">
+                        {dev.frameworks.map((framework) => (
+                            <span
+                                key={framework}
+                                className="rounded-xs border border-line-2 bg-white/2 px-2 py-0.5 font-mono text-[9px] font-semibold tracking-widest text-fg-2"
+                            >
+                                {framework}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="relative flex items-center px-6 pt-3.5 pb-3">

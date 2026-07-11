@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export default function WarBoardRow({ entry, gain }: WarBoardRowProps) {
     return (
-        <div className="relative grid grid-cols-[72px_56px_1fr_150px_110px] items-center gap-4 border-b border-line-1 px-6 py-[15px] hover:bg-ink-850 lg:grid-cols-[72px_56px_1fr_260px_150px_110px] lg:px-12">
+        <div className="relative grid grid-cols-[52px_40px_1fr_90px] items-center gap-3 border-b border-line-1 px-4 py-[15px] hover:bg-ink-850 lg:grid-cols-[72px_56px_1fr_260px_150px_110px] lg:gap-4 lg:px-12">
             <div className="flex items-center gap-2">
                 <span
                     className={cn(
@@ -52,7 +52,7 @@ export default function WarBoardRow({ entry, gain }: WarBoardRowProps) {
             <span className="text-right font-mono text-lg font-bold text-fg-1">
                 {formatPoints(entry.points)}
             </span>
-            <div className="flex items-center justify-end gap-2">
+            <div className="hidden items-center justify-end gap-2 lg:flex">
                 {gain && (
                     <span
                         key={gain.key}

@@ -19,7 +19,7 @@ export default function UsernameForm() {
     return (
         <form
             onSubmit={submit}
-            className="flex max-w-[520px] items-stretch overflow-hidden rounded-sm border border-line-2 bg-ink-850"
+            className="flex w-full max-w-[520px] items-stretch overflow-hidden rounded-sm border border-line-2 bg-ink-850"
         >
             <span className="flex items-center pr-1 pl-4 font-mono text-[15px] text-fg-4">
                 github.com/
@@ -33,7 +33,7 @@ export default function UsernameForm() {
             />
             <button
                 type="submit"
-                className="flex cursor-pointer items-center gap-2 bg-signal-500 px-6 text-[15px] font-semibold text-white hover:bg-signal-600"
+                className="flex cursor-pointer items-center gap-2 bg-signal-500 px-4 text-[15px] font-semibold text-white hover:bg-signal-600 sm:px-6"
             >
                 Get rated <span className="font-mono">→</span>
             </button>
