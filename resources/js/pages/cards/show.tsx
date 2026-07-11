@@ -1,0 +1,92 @@
+import { Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
+import GhostCardState from '@/components/card/GhostCardState';
+import LegionCard from '@/components/card/LegionCard';
+import type { ServerCardDev } from '@/components/card/types';
+import ChevronLogo from '@/components/shared/ChevronLogo';
+import TopNav from '@/components/shared/TopNav';
+import { FLAGS } from '@/lib/mock/flags';
+import { home } from '@/routes';
+import { show as legionsShow } from '@/routes/legions';
+
+interface CardsShowProps {
+    username: string;
+    dev: ServerCardDev | null;
+}
+
+export default function CardsShow({ username, dev }: CardsShowProps) {
+    const card = dev
+        ? { ...dev, flagCss: dev.nation ? (FLAGS[dev.nation] ?? '') : '' }
+        : null;
+    const [copied, setCopied] = useState(false);
+
+    function copyShareLink() {
+        void navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
+
+    return (
+        <>
+            <Head
+                title={
+                    card ? `@${card.handle} · OVR ${card.ovr}` : `@${username}`
+                }
+            />
+            <div className="relative flex min-h-screen flex-col overflow-hidden bg-ink-950 font-sans text-fg-1">
+                <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_50%_38%,rgba(255,46,77,0.06),transparent_65%)]" />
+                <div className="relative">
+                    <TopNav />
+                </div>
+                <div className="relative flex flex-1 flex-col items-center justify-center gap-6 px-6 py-14">
+                    {!card ? (
+                        <GhostCardState username={username} />
+                    ) : (
+                        <>
+                            <span className="font-mono text-xs font-semibold tracking-caps text-fg-3">
+                                {card.ovr >= 90
+                                    ? 'GOLD STRIKE · ANIMATED FOIL'
+                                    : 'STANDARD ISSUE'}
+                            </span>
+                            <div
+                                data-card-frame
+                                className="drop-shadow-[0_32px_48px_rgba(0,0,0,0.6)]"
+                            >
+                                <LegionCard dev={card} />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ChevronLogo size={14} />
+                                <span className="font-mono text-[11px] tracking-widest text-fg-3">
+                                    artisanlegion.dev/{card.handle}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={copyShareLink}
+                                    className="cursor-pointer rounded-sm bg-signal-500 px-6 py-3 text-sm font-semibold text-white hover:bg-signal-600"
+                                >
+                                    {copied ? 'Copied!' : 'Copy share link'}
+                                </button>
+                                {card.nation && (
+                                    <Link
+                                        href={legionsShow(card.nation)}
+                                        className="rounded-sm border border-line-2 px-6 py-3 text-sm font-medium text-fg-2 hover:text-fg-1"
+                                    >
+                                        View your legion
+                                    </Link>
+                                )}
+                            </div>
+                            <Link
+                                href={home()}
+                                className="font-mono text-xs text-fg-4 hover:text-fg-2"
+                            >
+                                Strike another card
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
+        </>
+    );
+}
