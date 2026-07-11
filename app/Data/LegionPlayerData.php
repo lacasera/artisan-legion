@@ -17,9 +17,10 @@ class LegionPlayerData extends Data
         public string $topLanguage,
         public bool $captain,
         public ?RatingBreakdownData $breakdown = null,
+        public ?string $countryCode = null,
     ) {}
 
-    public static function fromDev(Dev $dev, bool $captain = false, ?RatingBreakdownData $breakdown = null): self
+    public static function fromDev(Dev $dev, bool $captain = false, ?RatingBreakdownData $breakdown = null, ?string $countryCode = null): self
     {
         return new self(
             id: $dev->public_id,
@@ -29,6 +30,7 @@ class LegionPlayerData extends Data
             topLanguage: mb_strtoupper($dev->languages->first()->language ?? '—'),
             captain: $captain,
             breakdown: $breakdown,
+            countryCode: $countryCode,
         );
     }
 }

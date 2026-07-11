@@ -56,6 +56,22 @@ it('buckets_free_agents_into_the_world_xi', function () {
             ->where('legion.midfield.0.handle', 'wanderer'));
 });
 
+it('derives_a_country_code_for_world_xi_soldiers_from_location', function () {
+    Dev::factory()->create(['nation' => null, 'location' => 'Antwerp, Belgium', 'ovr' => 80, 'position' => 'CM', 'username' => 'flor']);
+
+    $this->get(route('legions.show', ['code' => 'WLD']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('legion.midfield.0.countryCode', 'BEL'));
+});
+
+it('leaves_country_code_null_on_national_legions', function () {
+    Dev::factory()->create(['nation' => 'GHA', 'location' => 'Antwerp, Belgium', 'ovr' => 80, 'position' => 'CM']);
+
+    $this->get(route('legions.show', ['code' => 'GHA']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('legion.midfield.0.countryCode', null));
+});
+
 it('accepts_a_lowercase_legion_code', function () {
     Dev::factory()->create(['nation' => 'GHA', 'ovr' => 70, 'position' => 'CM']);
 

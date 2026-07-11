@@ -32,7 +32,10 @@ class LegionService
 
     private const array OVERFLOW_ORDER = ['defense', 'midfield', 'attack', 'goalkeeper'];
 
-    public function __construct(private RatingEngine $ratingEngine) {}
+    public function __construct(
+        private RatingEngine $ratingEngine,
+        private CountryResolver $countryResolver,
+    ) {}
 
     public function legionFor(string $code): ?LegionData
     {
@@ -46,9 +49,11 @@ class LegionService
             return null;
         }
 
+        // Only the mixed-origin World XI needs per-soldier country flags.
+        $deriveCountry = $code === self::WORLD_CODE;
         $xi = $devs->take(self::XI_SIZE)->values();
         $captain = $xi->first();
-        $rows = $this->arrangeFormation($xi, $captain);
+        $rows = $this->arrangeFormation($xi, $captain, $deriveCountry);
 
         return new LegionData(
             code: $code,
@@ -62,7 +67,11 @@ class LegionService
             captain: LegionCaptainData::fromDev($captain),
             reserves: LegionPlayerData::collect(
                 $devs->slice(self::XI_SIZE, self::RESERVE_SIZE)->values()->map(
-                    fn (Dev $dev) => LegionPlayerData::fromDev($dev, breakdown: $this->breakdownFor($dev)),
+                    fn (Dev $dev) => LegionPlayerData::fromDev(
+                        $dev,
+                        breakdown: $this->breakdownFor($dev),
+                        countryCode: $deriveCountry ? $this->countryResolver->resolve($dev->location) : null,
+                    ),
                 ),
                 DataCollection::class,
             ),
@@ -110,7 +119,7 @@ class LegionService
      * @param  Collection<int, Dev>  $xi
      * @return array{attack: DataCollection<int, LegionPlayerData>, midfield: DataCollection<int, LegionPlayerData>, defense: DataCollection<int, LegionPlayerData>, goalkeeper: DataCollection<int, LegionPlayerData>}
      */
-    private function arrangeFormation(Collection $xi, Dev $captain): array
+    private function arrangeFormation(Collection $xi, Dev $captain, bool $deriveCountry): array
     {
         $rows = ['attack' => [], 'midfield' => [], 'defense' => [], 'goalkeeper' => []];
 
@@ -126,7 +135,12 @@ class LegionService
                 }
             }
 
-            $rows[$row][] = LegionPlayerData::fromDev($dev, captain: $dev->is($captain), breakdown: $this->breakdownFor($dev));
+            $rows[$row][] = LegionPlayerData::fromDev(
+                $dev,
+                captain: $dev->is($captain),
+                breakdown: $this->breakdownFor($dev),
+                countryCode: $deriveCountry ? $this->countryResolver->resolve($dev->location) : null,
+            );
         }
 
         return [

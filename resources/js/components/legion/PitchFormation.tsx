@@ -4,9 +4,11 @@ import type { Legion, LegionPlayer } from '@/components/legion/types';
 export default function PitchFormation({
     legion,
     onSelect,
+    selectedId,
 }: {
     legion: Legion;
     onSelect: (player: LegionPlayer) => void;
+    selectedId: string | null;
 }) {
     const formation = [
         legion.defense.length,
@@ -15,6 +17,13 @@ export default function PitchFormation({
     ]
         .filter((count) => count > 0)
         .join('–');
+
+    const rows: LegionPlayer[][] = [
+        legion.attack,
+        legion.midfield,
+        legion.defense,
+        legion.goalkeeper,
+    ];
 
     return (
         <div className="relative border-line-1 p-6 lg:border-r lg:px-12 lg:pt-10 lg:pb-12">
@@ -32,42 +41,27 @@ export default function PitchFormation({
                 <div className="absolute -top-px left-1/2 h-[90px] w-[300px] -translate-x-1/2 border border-t-0 border-white/8" />
                 <div className="absolute -bottom-px left-1/2 h-[90px] w-[300px] -translate-x-1/2 border border-b-0 border-white/8" />
                 <div className="absolute inset-0 flex flex-col justify-between px-3 py-6 lg:px-8 lg:py-11">
-                    <div className="flex justify-around">
-                        {legion.attack.map((player) => (
-                            <PlayerChip
-                                key={player.id}
-                                player={player}
-                                onSelect={onSelect}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex justify-around px-4 lg:px-15">
-                        {legion.midfield.map((player) => (
-                            <PlayerChip
-                                key={player.id}
-                                player={player}
-                                onSelect={onSelect}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex justify-around">
-                        {legion.defense.map((player) => (
-                            <PlayerChip
-                                key={player.id}
-                                player={player}
-                                onSelect={onSelect}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex justify-center">
-                        {legion.goalkeeper.map((player) => (
-                            <PlayerChip
-                                key={player.id}
-                                player={player}
-                                onSelect={onSelect}
-                            />
-                        ))}
-                    </div>
+                    {rows.map((row, index) => (
+                        <div
+                            key={index}
+                            className={
+                                index === 1
+                                    ? 'flex justify-around px-4 lg:px-15'
+                                    : index === 3
+                                      ? 'flex justify-center'
+                                      : 'flex justify-around'
+                            }
+                        >
+                            {row.map((player) => (
+                                <PlayerChip
+                                    key={player.id}
+                                    player={player}
+                                    onSelect={onSelect}
+                                    selected={player.id === selectedId}
+                                />
+                            ))}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

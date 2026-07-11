@@ -4,15 +4,28 @@ import CaptainCard from '@/components/legion/CaptainCard';
 import EnlistmentsPanel from '@/components/legion/EnlistmentsPanel';
 import LegionHeader from '@/components/legion/LegionHeader';
 import PitchFormation from '@/components/legion/PitchFormation';
-import PlayerBreakdownDialog from '@/components/legion/PlayerBreakdownDialog';
+import PlayerBreakdownPanel from '@/components/legion/PlayerBreakdownPanel';
 import ReservesList from '@/components/legion/ReservesList';
 import type { Legion, LegionPlayer } from '@/components/legion/types';
 import TopNav from '@/components/shared/TopNav';
 import { flagCssFor, nationNameFor } from '@/lib/nations';
 
+function findCaptain(legion: Legion): LegionPlayer | null {
+    const roster = [
+        ...legion.attack,
+        ...legion.midfield,
+        ...legion.defense,
+        ...legion.goalkeeper,
+    ];
+
+    return roster.find((player) => player.captain && player.breakdown) ?? null;
+}
+
 export default function LegionsShow({ legion }: { legion: Legion }) {
     const name = nationNameFor(legion.code);
-    const [selected, setSelected] = useState<LegionPlayer | null>(null);
+    const [selected, setSelected] = useState<LegionPlayer | null>(() =>
+        findCaptain(legion),
+    );
 
     return (
         <>
@@ -28,7 +41,11 @@ export default function LegionsShow({ legion }: { legion: Legion }) {
                     flagCss={flagCssFor(legion.code)}
                 />
                 <div className="grid lg:grid-cols-[1fr_420px]">
-                    <PitchFormation legion={legion} onSelect={setSelected} />
+                    <PitchFormation
+                        legion={legion}
+                        onSelect={setSelected}
+                        selectedId={selected?.id ?? null}
+                    />
                     <div className="flex flex-col gap-7 p-6 lg:px-10 lg:pt-10 lg:pb-12">
                         {legion.captain && (
                             <CaptainCard captain={legion.captain} />
@@ -36,19 +53,15 @@ export default function LegionsShow({ legion }: { legion: Legion }) {
                         <ReservesList
                             reserves={legion.reserves}
                             onSelect={setSelected}
+                            selectedId={selected?.id ?? null}
                         />
+                        {selected && <PlayerBreakdownPanel player={selected} />}
                         <EnlistmentsPanel
                             recentEnlistments={legion.recentEnlistments}
                         />
                     </div>
                 </div>
             </div>
-            {selected && (
-                <PlayerBreakdownDialog
-                    player={selected}
-                    onClose={() => setSelected(null)}
-                />
-            )}
         </>
     );
 }

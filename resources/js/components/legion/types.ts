@@ -8,6 +8,7 @@ export interface LegionPlayer {
     topLanguage: string;
     captain: boolean;
     breakdown: RatingBreakdown | null;
+    countryCode: string | null;
 }
 
 export interface LegionCaptain {
@@ -52,4 +53,5 @@ export interface LegionHeaderProps {
 export interface PlayerChipProps {
     player: LegionPlayer;
     onSelect?: (player: LegionPlayer) => void;
+    selected?: boolean;
 }

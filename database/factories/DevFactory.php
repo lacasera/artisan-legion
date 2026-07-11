@@ -49,6 +49,11 @@ class DevFactory extends Factory
 
     public function freeAgent(): static
     {
-        return $this->state(fn () => ['nation' => null, 'location' => null]);
+        // Nation is unresolved (hence World XI), but a raw location often
+        // survives — enough for a derived flag.
+        return $this->state(fn () => [
+            'nation' => null,
+            'location' => fake()->randomElement(['Brussels, Belgium', 'Dublin, Ireland', 'Seoul, South Korea', 'Mexico City', 'Zurich', null]),
+        ]);
     }
 }

@@ -1,8 +1,15 @@
 import type { PlayerChipProps } from '@/components/legion/types';
+import FlagChip from '@/components/shared/FlagChip';
+import { flagCssFor } from '@/lib/nations';
 import { cn } from '@/lib/utils';
 
-export default function PlayerChip({ player, onSelect }: PlayerChipProps) {
+export default function PlayerChip({
+    player,
+    onSelect,
+    selected,
+}: PlayerChipProps) {
     const clickable = player.breakdown !== null && onSelect !== undefined;
+    const flag = flagCssFor(player.countryCode);
 
     return (
         <button
@@ -16,11 +23,24 @@ export default function PlayerChip({ player, onSelect }: PlayerChipProps) {
                     : 'border-line-2 bg-ink-800',
                 clickable &&
                     'cursor-pointer transition-colors hover:border-live-500/60 hover:bg-ink-700',
+                selected &&
+                    'border-live-500 bg-ink-700 ring-1 ring-live-500/50',
             )}
         >
             {player.captain && (
                 <span className="absolute -top-2.5 -right-2.5 flex size-6 items-center justify-center rounded-full bg-cue-500 font-display text-[13px] font-bold text-ink-950">
                     C
+                </span>
+            )}
+            {player.countryCode && (
+                <span className="absolute top-1.5 left-1.5">
+                    {flag ? (
+                        <FlagChip flagCss={flag} width={16} height={11} />
+                    ) : (
+                        <span className="font-mono text-[8px] font-bold tracking-widest text-fg-4">
+                            {player.countryCode}
+                        </span>
+                    )}
                 </span>
             )}
             <div className="flex items-baseline gap-1.5">

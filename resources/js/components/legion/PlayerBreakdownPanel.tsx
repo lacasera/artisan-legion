@@ -1,28 +1,20 @@
 import { Link } from '@inertiajs/react';
-import { useEffect } from 'react';
 import type { LegionPlayer } from '@/components/legion/types';
 import { formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { show as cardsShow } from '@/routes/cards';
 
-export default function PlayerBreakdownDialog({
+const TOTALS = [
+    ['contributions', 'COMMITS'],
+    ['stars', 'STARS'],
+    ['followers', 'FOLLOWERS'],
+] as const;
+
+export default function PlayerBreakdownPanel({
     player,
-    onClose,
 }: {
     player: LegionPlayer;
-    onClose: () => void;
 }) {
-    useEffect(() => {
-        const onKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                onClose();
-            }
-        };
-        document.addEventListener('keydown', onKey);
-
-        return () => document.removeEventListener('keydown', onKey);
-    }, [onClose]);
-
     const breakdown = player.breakdown;
 
     if (breakdown === null) {
@@ -30,16 +22,11 @@ export default function PlayerBreakdownDialog({
     }
 
     return (
-        <div
-            role="dialog"
-            aria-modal="true"
-            onClick={onClose}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/80 px-6 py-10"
-        >
-            <div
-                onClick={(event) => event.stopPropagation()}
-                className="flex max-h-full w-full max-w-[420px] flex-col gap-4 overflow-y-auto rounded-xl border border-line-2 bg-ink-900 p-6 shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
-            >
+        <div className="flex flex-col gap-3.5">
+            <span className="font-mono text-xs font-semibold tracking-caps text-fg-2">
+                SOLDIER STATS
+            </span>
+            <div className="flex flex-col gap-4 rounded-lg border border-line-2 bg-ink-850 p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-0.5">
                         <span
@@ -56,24 +43,16 @@ export default function PlayerBreakdownDialog({
                             @{player.handle} · {breakdown.position}
                         </span>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        aria-label="Close"
-                        className="font-mono text-lg text-fg-4 hover:text-fg-1"
+                    <Link
+                        href={cardsShow(player.handle)}
+                        className="font-mono text-[11px] text-fg-3 hover:text-fg-1"
                     >
-                        ✕
-                    </button>
+                        full card →
+                    </Link>
                 </div>
 
-                <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-line-1 bg-ink-850">
-                    {(
-                        [
-                            ['contributions', 'COMMITS'],
-                            ['stars', 'STARS'],
-                            ['followers', 'FOLLOWERS'],
-                        ] as const
-                    ).map(([key, label]) => (
+                <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-line-1 bg-ink-900">
+                    {TOTALS.map(([key, label]) => (
                         <div
                             key={key}
                             className="flex flex-col gap-1 border-r border-line-1 px-2 py-3 text-center last:border-r-0"
@@ -114,7 +93,7 @@ export default function PlayerBreakdownDialog({
                     ))}
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg border border-line-1 bg-ink-850 px-3 py-2.5">
+                <div className="flex items-center gap-3 rounded-lg border border-line-1 bg-ink-900 px-3 py-2.5">
                     <span className="rounded-xs border border-line-2 bg-white/3 px-2 py-1 font-mono text-xs font-bold tracking-widest text-fg-1">
                         {breakdown.position}
                     </span>
@@ -122,13 +101,6 @@ export default function PlayerBreakdownDialog({
                         {breakdown.positionRule}
                     </span>
                 </div>
-
-                <Link
-                    href={cardsShow(player.handle)}
-                    className="rounded-sm bg-signal-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-signal-600"
-                >
-                    View full card →
-                </Link>
             </div>
         </div>
     );

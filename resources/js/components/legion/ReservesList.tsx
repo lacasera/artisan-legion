@@ -4,9 +4,11 @@ import { cn } from '@/lib/utils';
 export default function ReservesList({
     reserves,
     onSelect,
+    selectedId,
 }: {
     reserves: LegionPlayer[];
     onSelect: (player: LegionPlayer) => void;
+    selectedId: string | null;
 }) {
     if (reserves.length === 0) {
         return null;
@@ -32,6 +34,7 @@ export default function ReservesList({
                             className={cn(
                                 'grid grid-cols-[44px_1fr_52px_80px] items-center gap-2 border-b border-line-1 px-4 py-[11px] text-left',
                                 clickable && 'cursor-pointer hover:bg-ink-800',
+                                player.id === selectedId && 'bg-ink-700',
                             )}
                         >
                             <span className="font-mono text-[15px] font-bold text-fg-1">
