@@ -15,6 +15,12 @@ class RatingEngine
 {
     private const int MAX_STATS = 4;
 
+    /**
+     * A real public code footprint is enough to strike a card even after a
+     * quiet public year — only accounts with almost no code are unrateable.
+     */
+    private const int GHOST_MAX_BYTES = 20000;
+
     private const array BACKEND_LANGUAGES = [
         'PHP', 'Ruby', 'Python', 'Go', 'Java', 'Kotlin', 'C#', 'Elixir', 'Rust', 'C', 'C++', 'Scala', 'Perl', 'Blade',
     ];
@@ -44,8 +50,15 @@ class RatingEngine
 
     public function isGhost(GitHubProfileData $profile): bool
     {
-        return $profile->languages === []
-            || ($profile->totalContributions < 10 && $profile->totalStars === 0);
+        if ($profile->languages === []) {
+            return true;
+        }
+
+        $totalBytes = array_sum(array_column($profile->languages, 'bytes'));
+
+        return $totalBytes < self::GHOST_MAX_BYTES
+            && $profile->totalStars === 0
+            && $profile->totalContributions < 10;
     }
 
     /**
@@ -100,7 +113,7 @@ class RatingEngine
     public function positionWithRule(GitHubProfileData $profile): array
     {
         if ($profile->totalContributions >= 5000) {
-            return ['position' => 'ST', 'rule' => '5,000+ open-source contributions this year — prolific shipper'];
+            return ['position' => 'ST', 'rule' => '5,000+ contributions this year — prolific shipper'];
         }
 
         $shares = $this->categoryShares($profile);

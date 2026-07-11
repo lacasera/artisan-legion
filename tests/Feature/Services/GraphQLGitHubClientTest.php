@@ -47,26 +47,26 @@ it('handles_missing_or_malformed_manifests', function () {
     expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->frameworks)->toBe([]);
 });
 
-it('counts_only_public_contributions', function () {
+it('counts_the_full_contribution_calendar_including_opted_in_private', function () {
+    // GitHub only puts private contributions in the calendar when the dev
+    // opted in — so the calendar total is exactly what they chose to surface.
     Http::fake([
         'api.github.com/graphql' => Http::response(githubUserResponse([
             'contributionsCollection' => [
-                'restrictedContributionsCount' => 700,
                 'contributionCalendar' => ['totalContributions' => 3200],
             ],
         ])),
     ]);
 
-    expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->totalContributions)->toBe(2500);
+    expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->totalContributions)->toBe(3200);
 });
 
-it('counts_only_public_contributions_when_polling_the_war', function () {
+it('counts_the_full_contribution_calendar_when_polling_the_war', function () {
     Http::fake([
         'api.github.com/graphql' => Http::response([
             'data' => [
                 'user' => [
                     'contributionsCollection' => [
-                        'restrictedContributionsCount' => 40,
                         'contributionCalendar' => ['totalContributions' => 1240],
                     ],
                 ],
@@ -74,7 +74,7 @@ it('counts_only_public_contributions_when_polling_the_war', function () {
         ]),
     ]);
 
-    expect(app(GraphQLGitHubClient::class)->fetchContributionCount('taylorotwell'))->toBe(1200);
+    expect(app(GraphQLGitHubClient::class)->fetchContributionCount('taylorotwell'))->toBe(1240);
 });
 
 it('returns_null_for_an_unknown_user', function () {

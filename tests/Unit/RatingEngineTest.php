@@ -42,6 +42,21 @@ it('rates_a_ghost_profile_as_null_when_activity_is_negligible', function () {
     expect($engine->rate($profile))->toBeNull();
 });
 
+it('rates_a_dev_with_a_real_codebase_but_a_quiet_public_year', function () {
+    $engine = new RatingEngine;
+    // Rich language footprint, but few public contributions and no stars this
+    // year (works mostly on private repos) — must still get a real card.
+    $profile = profileWith([
+        'PHP' => ['bytes' => 376712, 'stars' => 0, 'recent' => false],
+        'Vue' => ['bytes' => 106815, 'stars' => 0, 'recent' => false],
+        'Blade' => ['bytes' => 41594, 'stars' => 0, 'recent' => false],
+        'TypeScript' => ['bytes' => 8530, 'stars' => 0, 'recent' => false],
+    ], contributions: 4, stars: 0, followers: 19);
+
+    expect($engine->isGhost($profile))->toBeFalse()
+        ->and($engine->rate($profile))->not->toBeNull();
+});
+
 it('scores_the_dominant_language_highest_and_keeps_all_scores_in_range', function () {
     $engine = new RatingEngine;
     $profile = profileWith([

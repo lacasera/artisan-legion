@@ -6,7 +6,7 @@ const TOTALS: {
     key: 'contributions' | 'stars' | 'followers';
     label: string;
 }[] = [
-    { key: 'contributions', label: 'OPEN-SOURCE COMMITS · YR' },
+    { key: 'contributions', label: 'CONTRIBUTIONS · YR' },
     { key: 'stars', label: 'STARS' },
     { key: 'followers', label: 'FOLLOWERS' },
 ];

@@ -26,8 +26,8 @@ export default function HeroSection({
                     have a rating.
                 </h1>
                 <p className="max-w-[460px] text-lg leading-relaxed text-fg-2">
-                    Get your card. Join your country's legion. Every open-source
-                    push this week is a point in the war.
+                    Get your card. Join your country's legion. Every push this
+                    week is a point in the war.
                 </p>
                 <UsernameForm />
                 <span className="font-mono text-xs tracking-[0.06em] text-fg-4">

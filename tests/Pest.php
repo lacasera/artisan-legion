@@ -63,7 +63,6 @@ function githubUserResponse(array $overrides = []): array
         'location' => 'Little Rock, USA',
         'followers' => ['totalCount' => 8000],
         'contributionsCollection' => [
-            'restrictedContributionsCount' => 0,
             'contributionCalendar' => ['totalContributions' => 3200],
         ],
         'repositories' => [

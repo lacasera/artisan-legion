@@ -22,7 +22,6 @@ class GraphQLGitHubClient implements GitHubClient
                 location
                 followers { totalCount }
                 contributionsCollection {
-                    restrictedContributionsCount
                     contributionCalendar { totalContributions }
                 }
                 repositories(first: 100, ownerAffiliations: OWNER, isFork: false, orderBy: {field: STARGAZERS, direction: DESC}) {
@@ -70,7 +69,6 @@ class GraphQLGitHubClient implements GitHubClient
         query DevContributions($login: String!) {
             user(login: $login) {
                 contributionsCollection {
-                    restrictedContributionsCount
                     contributionCalendar { totalContributions }
                 }
             }
@@ -95,7 +93,7 @@ class GraphQLGitHubClient implements GitHubClient
             avatarUrl: data_get($user, 'avatarUrl'),
             location: data_get($user, 'location'),
             followers: (int) data_get($user, 'followers.totalCount', 0),
-            totalContributions: $this->publicContributions($user),
+            totalContributions: $this->contributionCount($user),
             totalStars: (int) collect($repositories)->sum('stargazerCount'),
             languages: $this->aggregateLanguages($repositories),
             frameworks: $this->inferFrameworks($user),
@@ -163,20 +161,18 @@ class GraphQLGitHubClient implements GitHubClient
             return null;
         }
 
-        return $this->publicContributions($user);
+        return $this->contributionCount($user);
     }
 
     /**
-     * The calendar total includes anonymized private contributions for users
-     * who opted in — subtract them so ratings and war points count open
-     * source only, identically for everyone.
+     * The contribution calendar total already reflects the dev's own privacy
+     * choice: it counts private contributions only when they enabled "include
+     * private contributions on my profile". We honour that and never see the
+     * private code itself — only the anonymized count.
      */
-    private function publicContributions(mixed $user): int
+    private function contributionCount(mixed $user): int
     {
-        $total = (int) data_get($user, 'contributionsCollection.contributionCalendar.totalContributions', 0);
-        $restricted = (int) data_get($user, 'contributionsCollection.restrictedContributionsCount', 0);
-
-        return max(0, $total - $restricted);
+        return (int) data_get($user, 'contributionsCollection.contributionCalendar.totalContributions', 0);
     }
 
     private function query(string $query, string $username): Response

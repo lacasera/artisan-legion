@@ -75,7 +75,7 @@ export default function War({ board, pushingCount, resetsAt }: WarPageProps) {
                 )}
                 <div className="flex flex-col gap-2 px-6 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-12">
                     <span className="font-mono text-xs text-fg-4">
-                        points are open-source commits, weighted by rating · 30
+                        points are contributions, weighted by rating · 30
                         full-value commits a day, diminishing after
                     </span>
                     <span className="font-mono text-xs text-fg-3">

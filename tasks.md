@@ -98,7 +98,7 @@ Every screen is built against DTO contracts fed by a mock provider. Later phases
 - [x] Themed error pages: `error.tsx` (404/419/429 always, 500/503 in production) via `withExceptions` respond hook
 - [x] Mobile sweep at 390px: card/sealed/ghost scale wrappers, pitch + chips resize, war board 4-column mobile grid, hero headline/form fixes
 - [x] PNG insurance: `og-fallback.png` sealed-card banner served when Browsershot fails; `BROWSERSHOT_NO_SANDBOX` env flag for Cloud
-- [x] Open-source-only counting: `restrictedContributionsCount` subtracted everywhere (ratings + war points)
+- [x] Contribution counting: use the GitHub calendar total as-is (private counts included only when the dev opted in — honours their choice; we never see private code). Copy says generic "contributions". Ghost detection is byte-based so a real public codebase is never ghosted.
 
 ## Stretch (only if everything above is done)
 
