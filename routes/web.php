@@ -12,8 +12,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/war', WeeklyWarController::class)->name('war');
-Route::get('/lookup/{username}', LookupController::class)->name('lookup');
-Route::get('/cards/{username}', DevCardController::class)->name('cards.show');
-Route::get('/cards/{username}/card.png', CardImageController::class)->name('cards.image');
+
+Route::get('/lookup/{username}', LookupController::class)
+    ->middleware('throttle:lookup')
+    ->name('lookup');
+
+Route::get('/cards/{username}', DevCardController::class)
+    ->middleware('throttle:cards')
+    ->name('cards.show');
+
+Route::get('/cards/{username}/card.png', CardImageController::class)
+    ->middleware('throttle:cards')
+    ->name('cards.image');
+
 Route::get('/legions', [LegionController::class, 'index'])->name('legions.index');
 Route::get('/legions/{code}', [LegionController::class, 'show'])->name('legions.show');

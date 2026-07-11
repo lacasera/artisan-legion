@@ -1,49 +1,51 @@
-export interface PitchPlayer {
+export interface LegionPlayer {
+    id: string;
     handle: string;
     ovr: number;
     pos: string;
-    lang: string;
-    captain?: boolean;
-}
-
-export interface BenchPlayer {
-    handle: string;
-    ovr: number;
-    pos: string;
-    lang: string;
+    topLanguage: string;
+    captain: boolean;
 }
 
 export interface LegionCaptain {
+    id: string;
     name: string;
     handle: string;
     pos: string;
     ovr: number;
     initials: string;
-    weeklySummary: string;
 }
 
-export interface LegionSquad {
-    formation: string;
+export interface Legion {
+    code: string;
+    rank: number;
+    soldierCount: number;
     averageOvr: string;
-    attack: PitchPlayer[];
-    midfield: PitchPlayer[];
-    defense: PitchPlayer[];
-    goalkeeper: PitchPlayer[];
-    bench: BenchPlayer[];
-    captain: LegionCaptain;
+    attack: LegionPlayer[];
+    midfield: LegionPlayer[];
+    defense: LegionPlayer[];
+    goalkeeper: LegionPlayer[];
+    captain: LegionCaptain | null;
+    reserves: LegionPlayer[];
+    recentEnlistments: number;
+}
+
+export interface LegionSummary {
+    code: string;
+    soldiers: number;
+    averageOvr: string;
+    topSoldier: string;
 }
 
 export interface LegionHeaderProps {
     code: string;
     name: string;
-    soldierCount: string;
-    standing: number;
-    standingMove: string;
-    points: number;
-    behindText: string;
+    soldierCount: number;
+    rank: number;
+    averageOvr: string;
     flagCss: string;
 }
 
 export interface PlayerChipProps {
-    player: PitchPlayer;
+    player: LegionPlayer;
 }

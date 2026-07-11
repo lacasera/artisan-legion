@@ -33,7 +33,7 @@ export default function PlayerChip({ player }: PlayerChipProps) {
                 @{player.handle}
             </span>
             <span className="font-mono text-[10px] tracking-[0.06em] text-fg-4">
-                {player.lang}
+                {player.topLanguage}
             </span>
         </div>
     );

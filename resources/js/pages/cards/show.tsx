@@ -5,7 +5,7 @@ import LegionCard from '@/components/card/LegionCard';
 import type { ServerCardDev } from '@/components/card/types';
 import ChevronLogo from '@/components/shared/ChevronLogo';
 import TopNav from '@/components/shared/TopNav';
-import { FLAGS } from '@/lib/mock/flags';
+import { flagCssFor } from '@/lib/nations';
 import { home } from '@/routes';
 import { show as legionsShow } from '@/routes/legions';
 
@@ -15,9 +15,7 @@ interface CardsShowProps {
 }
 
 export default function CardsShow({ username, dev }: CardsShowProps) {
-    const card = dev
-        ? { ...dev, flagCss: dev.nation ? (FLAGS[dev.nation] ?? '') : '' }
-        : null;
+    const card = dev ? { ...dev, flagCss: flagCssFor(dev.nation) } : null;
     const [copied, setCopied] = useState(false);
 
     function copyShareLink() {

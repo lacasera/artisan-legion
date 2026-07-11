@@ -6,6 +6,7 @@ namespace App\Services\GitHub;
 
 use App\Data\GitHubProfileData;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class GraphQLGitHubClient implements GitHubClient
@@ -21,6 +22,7 @@ class GraphQLGitHubClient implements GitHubClient
                 location
                 followers { totalCount }
                 contributionsCollection {
+                    restrictedContributionsCount
                     contributionCalendar { totalContributions }
                 }
                 repositories(first: 100, ownerAffiliations: OWNER, isFork: false, orderBy: {field: STARGAZERS, direction: DESC}) {
@@ -39,26 +41,20 @@ class GraphQLGitHubClient implements GitHubClient
         }
         GRAPHQL;
 
+    private const string CONTRIBUTIONS_QUERY = <<<'GRAPHQL'
+        query DevContributions($login: String!) {
+            user(login: $login) {
+                contributionsCollection {
+                    restrictedContributionsCount
+                    contributionCalendar { totalContributions }
+                }
+            }
+        }
+        GRAPHQL;
+
     public function fetchProfile(string $username): ?GitHubProfileData
     {
-        $response = Http::withToken((string) config('services.github.token'))
-            ->timeout(15)
-            ->connectTimeout(5)
-            ->retry(2, 500, fn (\Throwable $exception) => $exception instanceof ConnectionException, throw: false)
-            ->post(self::ENDPOINT, [
-                'query' => self::QUERY,
-                'variables' => ['login' => $username],
-            ]);
-
-        if ($response->status() === 403 || $response->status() === 429) {
-            throw new GitHubRateLimitedException("GitHub rate limit hit while fetching {$username}.");
-        }
-
-        $response->throw();
-
-        if ($this->isRateLimitedGraphQLError($response->json('errors', []))) {
-            throw new GitHubRateLimitedException("GitHub GraphQL rate limit hit while fetching {$username}.");
-        }
+        $response = $this->query(self::QUERY, $username);
 
         $user = $response->json('data.user');
 
@@ -74,10 +70,60 @@ class GraphQLGitHubClient implements GitHubClient
             avatarUrl: data_get($user, 'avatarUrl'),
             location: data_get($user, 'location'),
             followers: (int) data_get($user, 'followers.totalCount', 0),
-            totalContributions: (int) data_get($user, 'contributionsCollection.contributionCalendar.totalContributions', 0),
+            totalContributions: $this->publicContributions($user),
             totalStars: (int) collect($repositories)->sum('stargazerCount'),
             languages: $this->aggregateLanguages($repositories),
         );
+    }
+
+    public function fetchContributionCount(string $username): ?int
+    {
+        $response = $this->query(self::CONTRIBUTIONS_QUERY, $username);
+
+        $user = $response->json('data.user');
+
+        if ($user === null) {
+            return null;
+        }
+
+        return $this->publicContributions($user);
+    }
+
+    /**
+     * The calendar total includes anonymized private contributions for users
+     * who opted in — subtract them so ratings and war points count open
+     * source only, identically for everyone.
+     */
+    private function publicContributions(mixed $user): int
+    {
+        $total = (int) data_get($user, 'contributionsCollection.contributionCalendar.totalContributions', 0);
+        $restricted = (int) data_get($user, 'contributionsCollection.restrictedContributionsCount', 0);
+
+        return max(0, $total - $restricted);
+    }
+
+    private function query(string $query, string $username): Response
+    {
+        $response = Http::withToken((string) config('services.github.token'))
+            ->timeout(15)
+            ->connectTimeout(5)
+            ->retry(2, 500, fn (\Throwable $exception) => $exception instanceof ConnectionException, throw: false)
+            ->post(self::ENDPOINT, [
+                'query' => $query,
+                'variables' => ['login' => $username],
+            ]);
+
+        if ($response->status() === 403 || $response->status() === 429) {
+            throw new GitHubRateLimitedException("GitHub rate limit hit while fetching {$username}.");
+        }
+
+        $response->throw();
+
+        if ($this->isRateLimitedGraphQLError($response->json('errors', []))) {
+            throw new GitHubRateLimitedException("GitHub GraphQL rate limit hit while fetching {$username}.");
+        }
+
+        return $response;
     }
 
     /**

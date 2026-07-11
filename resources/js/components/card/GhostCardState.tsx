@@ -21,7 +21,7 @@ export default function GhostCardState({ username }: { username: string }) {
                     </span>
                 </div>
                 <span className="absolute bottom-3 font-mono text-[10px] tracking-widest text-fg-4">
-                    ARTISAN LEGION · S03 · W27 · UNRATED
+                    ARTISAN LEGION · S03 · UNRATED
                 </span>
             </div>
             <Link

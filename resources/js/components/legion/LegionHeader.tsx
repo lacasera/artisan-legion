@@ -7,10 +7,8 @@ export default function LegionHeader({
     code,
     name,
     soldierCount,
-    standing,
-    standingMove,
-    points,
-    behindText,
+    rank,
+    averageOvr,
     flagCss,
 }: LegionHeaderProps) {
     return (
@@ -36,7 +34,8 @@ export default function LegionHeader({
                 </div>
                 <div className="flex flex-col gap-1">
                     <span className="font-mono text-xs font-semibold tracking-caps text-fg-3">
-                        LEGION · {soldierCount} SOLDIERS
+                        LEGION · {formatPoints(soldierCount)}{' '}
+                        {soldierCount === 1 ? 'SOLDIER' : 'SOLDIERS'}
                     </span>
                     <h2 className="font-display text-4xl leading-none font-bold tracking-[-0.01em] uppercase lg:text-[52px]">
                         {name}
@@ -46,27 +45,22 @@ export default function LegionHeader({
             <div className="relative flex items-center gap-10">
                 <div className="flex flex-col items-end gap-1">
                     <span className="font-mono text-[11px] font-semibold tracking-caps text-fg-3">
-                        WEEKLY WAR STANDING
+                        LEGION RANK
                     </span>
-                    <div className="flex items-baseline gap-2.5">
-                        <span className="font-display text-5xl leading-none font-bold">
-                            #{standing}
-                        </span>
-                        <span className="font-mono text-sm font-bold text-live-500">
-                            {standingMove}
-                        </span>
-                    </div>
+                    <span className="font-display text-5xl leading-none font-bold">
+                        #{rank}
+                    </span>
                 </div>
                 <div className="h-14 w-px bg-line-2" />
                 <div className="flex flex-col items-end gap-1">
                     <span className="font-mono text-[11px] font-semibold tracking-caps text-fg-3">
-                        WAR POINTS · W27
+                        AVG OVR · TOP XI
                     </span>
                     <span className="font-mono text-[34px] leading-tight font-bold">
-                        {formatPoints(points)}
+                        {averageOvr}
                     </span>
                     <span className="font-mono text-xs text-fg-3">
-                        {behindText}
+                        war points arrive with the weekly war
                     </span>
                 </div>
             </div>

@@ -12,4 +12,10 @@ interface GitHubClient
      * Fetch aggregated public stats for a username, or null when the user does not exist.
      */
     public function fetchProfile(string $username): ?GitHubProfileData;
+
+    /**
+     * Fetch only the past-year contribution total, or null when the user does not exist.
+     * Much cheaper than fetchProfile — used by the weekly-war polling loop.
+     */
+    public function fetchContributionCount(string $username): ?int;
 }

@@ -46,6 +46,10 @@ it('renders_the_ghost_state_for_an_unknown_user', function () {
         ->assertInertia(fn (Assert $page) => $page->where('dev', null));
 });
 
+it('rejects_invalid_github_usernames', function () {
+    $this->get('/cards/-invalid-')->assertNotFound();
+});
+
 it('embeds_open_graph_meta_tags_for_link_unfurls', function () {
     Http::fake(['api.github.com/graphql' => Http::response(githubUserResponse())]);
 

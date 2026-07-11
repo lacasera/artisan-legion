@@ -18,7 +18,7 @@ export default function CaptainCard({ captain }: { captain: LegionCaptain }) {
                         @{captain.handle} · {captain.pos}
                     </span>
                     <span className="font-mono text-[11px] text-fg-4">
-                        {captain.weeklySummary}
+                        highest-rated soldier in the legion
                     </span>
                 </div>
                 <span className="font-display text-[40px] font-bold text-cue-500">

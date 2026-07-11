@@ -2,8 +2,14 @@ import { Head } from '@inertiajs/react';
 import HeroSection from '@/components/landing/HeroSection';
 import WarTicker from '@/components/landing/WarTicker';
 import TopNav from '@/components/shared/TopNav';
+import type { WarBoardEntry } from '@/components/war/types';
 
-export default function Home() {
+interface HomeProps {
+    ticker: WarBoardEntry[];
+    soldierCount: number;
+}
+
+export default function Home({ ticker, soldierCount }: HomeProps) {
     return (
         <>
             <Head title="Your commits have a rating" />
@@ -13,9 +19,9 @@ export default function Home() {
                 <div className="relative flex min-h-screen flex-col">
                     <TopNav />
                     <div className="flex-1">
-                        <HeroSection />
+                        <HeroSection soldierCount={soldierCount} />
                     </div>
-                    <WarTicker />
+                    <WarTicker ticker={ticker} />
                 </div>
             </div>
         </>

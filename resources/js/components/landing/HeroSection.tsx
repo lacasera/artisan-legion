@@ -1,9 +1,14 @@
 import LegionCard from '@/components/card/LegionCard';
 import UsernameForm from '@/components/landing/UsernameForm';
 import ChevronLogo from '@/components/shared/ChevronLogo';
+import { formatPoints } from '@/lib/format';
 import { MOCK_DEVS } from '@/lib/mock/devs';
 
-export default function HeroSection() {
+export default function HeroSection({
+    soldierCount,
+}: {
+    soldierCount: number;
+}) {
     return (
         <div className="relative grid items-center gap-10 px-6 py-16 lg:grid-cols-[1fr_560px] lg:px-10 lg:pt-[72px]">
             <div className="flex max-w-[620px] flex-col gap-7">
@@ -11,7 +16,8 @@ export default function HeroSection() {
                     <span className="h-px w-6 bg-fg-3" />
                     <span className="-ml-2.5 size-[5px] rounded-full bg-signal-500" />
                     <span className="font-mono text-xs font-semibold tracking-caps text-fg-3">
-                        SEASON 03 · 41,208 SOLDIERS ENLISTED
+                        SEASON 03 · {formatPoints(soldierCount)}{' '}
+                        {soldierCount === 1 ? 'SOLDIER' : 'SOLDIERS'} ENLISTED
                     </span>
                 </div>
                 <h1 className="font-display text-6xl leading-[0.94] font-bold tracking-[-0.015em] uppercase lg:text-[88px]">
@@ -20,8 +26,8 @@ export default function HeroSection() {
                     have a rating.
                 </h1>
                 <p className="max-w-[460px] text-lg leading-relaxed text-fg-2">
-                    Get your card. Join your country's legion. Every push this
-                    week is a point in the war.
+                    Get your card. Join your country's legion. Every open-source
+                    push this week is a point in the war.
                 </p>
                 <UsernameForm />
                 <span className="font-mono text-xs tracking-[0.06em] text-fg-4">

@@ -25,6 +25,36 @@ it('fetches_and_aggregates_a_profile', function () {
         ->and($profile->languages['Shell']['stars'])->toBe(0);
 });
 
+it('counts_only_public_contributions', function () {
+    Http::fake([
+        'api.github.com/graphql' => Http::response(githubUserResponse([
+            'contributionsCollection' => [
+                'restrictedContributionsCount' => 700,
+                'contributionCalendar' => ['totalContributions' => 3200],
+            ],
+        ])),
+    ]);
+
+    expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->totalContributions)->toBe(2500);
+});
+
+it('counts_only_public_contributions_when_polling_the_war', function () {
+    Http::fake([
+        'api.github.com/graphql' => Http::response([
+            'data' => [
+                'user' => [
+                    'contributionsCollection' => [
+                        'restrictedContributionsCount' => 40,
+                        'contributionCalendar' => ['totalContributions' => 1240],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    expect(app(GraphQLGitHubClient::class)->fetchContributionCount('taylorotwell'))->toBe(1200);
+});
+
 it('returns_null_for_an_unknown_user', function () {
     Http::fake(['api.github.com/graphql' => Http::response(['data' => ['user' => null]])]);
 

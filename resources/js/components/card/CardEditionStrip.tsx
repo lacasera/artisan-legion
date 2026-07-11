@@ -1,14 +1,18 @@
+import { usePage } from '@inertiajs/react';
 import type { CardEditionStripProps } from '@/components/card/types';
+import type { SharedProps } from '@/types';
 
 export default function CardEditionStrip({
     serial,
     tier,
     chevronColor,
 }: CardEditionStripProps) {
+    const { weekLabel } = usePage<SharedProps>().props;
+
     return (
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-line-1 px-6 py-3">
             <span className="font-mono text-[10px] font-medium tracking-widest text-fg-3">
-                ARTISAN LEGION · S03 · W27 · № {serial}
+                ARTISAN LEGION · S03 · {weekLabel} · № {serial}
             </span>
             <div className="flex items-end gap-[3px]">
                 {Array.from({ length: tier }, (_, index) => (

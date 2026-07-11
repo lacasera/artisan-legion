@@ -1,30 +1,26 @@
-export interface WarNation {
+export interface WarBoardEntry {
     code: string;
-    name: string;
-    pts: number;
-    day: number;
-    top: string;
+    rank: number;
     move: string;
+    points: number;
+    dayPoints: number;
+    topSoldier: string;
     pushing: boolean;
-    soldiers: number;
-}
-
-export interface BoardRow extends WarNation {
-    rank: string;
-    livePts: number;
     pct: number;
-    isMine: boolean;
-    gain: number;
-    gainKey: string;
 }
 
-export interface WarTickerState {
-    board: BoardRow[];
+export interface GainFlash {
+    amount: number;
+    key: number;
+}
+
+export interface WarPageProps {
+    board: WarBoardEntry[];
     pushingCount: number;
-    countdown: number;
+    resetsAt: string;
 }
 
 export interface WarBoardRowProps {
-    row: BoardRow;
-    isLeader: boolean;
+    entry: WarBoardEntry;
+    gain: GainFlash | undefined;
 }

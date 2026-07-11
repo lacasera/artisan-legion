@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
+use App\Services\WeeklyWarService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'weekLabel' => app(WeeklyWarService::class)->weekLabel(),
         ];
     }
 }

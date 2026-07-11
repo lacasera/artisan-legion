@@ -11,7 +11,7 @@ export default function SealedCard({ username }: { username: string }) {
                         ARTISAN LEGION
                     </span>
                     <span className="font-mono text-[11px] tracking-[0.12em] text-fg-4">
-                        SEALED · S03 · W27
+                        SEALED · S03
                     </span>
                 </div>
                 <div className="pointer-events-none absolute inset-x-0 h-[90px] animate-al-scan bg-[linear-gradient(180deg,transparent,rgba(33,224,196,0.10)_45%,rgba(33,224,196,0.55)_50%,rgba(33,224,196,0.10)_55%,transparent)]" />
