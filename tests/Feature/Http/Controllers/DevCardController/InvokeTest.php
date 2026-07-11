@@ -27,6 +27,15 @@ it('renders_the_card_page_with_the_struck_card', function () {
             ->where('og.image', route('cards.image', ['username' => 'taylorotwell'])));
 });
 
+it('shares_the_app_host_for_the_card_share_url', function () {
+    config()->set('app.url', 'https://artisanlegion.dev');
+    Http::fake(['api.github.com/graphql' => Http::response(githubUserResponse())]);
+
+    $this->get(route('cards.show', ['username' => 'taylorotwell']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('appHost', 'artisanlegion.dev'));
+});
+
 it('omits_the_breakdown_for_a_ghost_card', function () {
     Http::fake([
         'api.github.com/graphql' => Http::response(githubUserResponse([

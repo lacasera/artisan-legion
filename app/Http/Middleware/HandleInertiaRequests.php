@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'weekLabel' => app(WeeklyWarService::class)->weekLabel(),
+            'appHost' => str((string) config('app.url'))->after('://')->before('/')->toString(),
         ];
     }
 }

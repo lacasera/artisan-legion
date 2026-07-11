@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import GhostCardState from '@/components/card/GhostCardState';
 import LegionCard from '@/components/card/LegionCard';
@@ -12,6 +12,7 @@ import TopNav from '@/components/shared/TopNav';
 import { flagCssFor } from '@/lib/nations';
 import { home } from '@/routes';
 import { show as legionsShow } from '@/routes/legions';
+import type { SharedProps } from '@/types';
 
 interface CardsShowProps {
     username: string;
@@ -24,6 +25,7 @@ export default function CardsShow({
     dev,
     breakdown,
 }: CardsShowProps) {
+    const { appHost } = usePage<SharedProps>().props;
     const card = dev ? { ...dev, flagCss: flagCssFor(dev.nation) } : null;
     const [copied, setCopied] = useState(false);
 
@@ -65,7 +67,7 @@ export default function CardsShow({
                                 <div className="flex items-center gap-2">
                                     <ChevronLogo size={14} />
                                     <span className="font-mono text-[11px] tracking-widest text-fg-3">
-                                        artisanlegion.dev/{card.handle}
+                                        {appHost}/{card.handle}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-3">
