@@ -49,8 +49,8 @@ export default function CardsShow({
                     {!card ? (
                         <GhostCardState username={username} />
                     ) : (
-                        <div className="flex w-full max-w-5xl flex-col items-center gap-10 lg:flex-row lg:items-start lg:justify-center">
-                            <div className="flex flex-col items-center gap-6">
+                        <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:items-start lg:justify-center">
+                            <div className="flex w-full max-w-[400px] flex-col items-center gap-6">
                                 <span className="font-mono text-xs font-semibold tracking-caps text-fg-3">
                                     {card.ovr >= 90
                                         ? 'GOLD STRIKE · ANIMATED FOIL'
@@ -93,7 +93,7 @@ export default function CardsShow({
                                 </Link>
                             </div>
                             {breakdown && (
-                                <div className="w-full lg:pt-7">
+                                <div className="flex w-full max-w-[400px] justify-center lg:pt-7">
                                     <RatingBreakdown breakdown={breakdown} />
                                 </div>
                             )}
