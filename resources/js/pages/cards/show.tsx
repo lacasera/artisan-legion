@@ -2,7 +2,11 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import GhostCardState from '@/components/card/GhostCardState';
 import LegionCard from '@/components/card/LegionCard';
-import type { ServerCardDev } from '@/components/card/types';
+import RatingBreakdown from '@/components/card/RatingBreakdown';
+import type {
+    RatingBreakdown as RatingBreakdownType,
+    ServerCardDev,
+} from '@/components/card/types';
 import ChevronLogo from '@/components/shared/ChevronLogo';
 import TopNav from '@/components/shared/TopNav';
 import { flagCssFor } from '@/lib/nations';
@@ -12,9 +16,14 @@ import { show as legionsShow } from '@/routes/legions';
 interface CardsShowProps {
     username: string;
     dev: ServerCardDev | null;
+    breakdown: RatingBreakdownType | null;
 }
 
-export default function CardsShow({ username, dev }: CardsShowProps) {
+export default function CardsShow({
+    username,
+    dev,
+    breakdown,
+}: CardsShowProps) {
     const card = dev ? { ...dev, flagCss: flagCssFor(dev.nation) } : null;
     const [copied, setCopied] = useState(false);
 
@@ -75,6 +84,9 @@ export default function CardsShow({ username, dev }: CardsShowProps) {
                                     </Link>
                                 )}
                             </div>
+                            {breakdown && (
+                                <RatingBreakdown breakdown={breakdown} />
+                            )}
                             <Link
                                 href={home()}
                                 className="font-mono text-xs text-fg-4 hover:text-fg-2"

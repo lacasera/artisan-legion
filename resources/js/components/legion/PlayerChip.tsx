@@ -1,14 +1,21 @@
 import type { PlayerChipProps } from '@/components/legion/types';
 import { cn } from '@/lib/utils';
 
-export default function PlayerChip({ player }: PlayerChipProps) {
+export default function PlayerChip({ player, onSelect }: PlayerChipProps) {
+    const clickable = player.breakdown !== null && onSelect !== undefined;
+
     return (
-        <div
+        <button
+            type="button"
+            disabled={!clickable}
+            onClick={clickable ? () => onSelect(player) : undefined}
             className={cn(
-                'relative flex w-24 flex-col items-center gap-1.5 rounded-sm border px-2 py-3 lg:w-32',
+                'relative flex w-24 flex-col items-center gap-1.5 rounded-sm border px-2 py-3 text-left lg:w-32',
                 player.captain
                     ? 'border-cue-500/45 bg-cue-500/6'
                     : 'border-line-2 bg-ink-800',
+                clickable &&
+                    'cursor-pointer transition-colors hover:border-live-500/60 hover:bg-ink-700',
             )}
         >
             {player.captain && (
@@ -35,6 +42,6 @@ export default function PlayerChip({ player }: PlayerChipProps) {
             <span className="font-mono text-[10px] tracking-[0.06em] text-fg-4">
                 {player.topLanguage}
             </span>
-        </div>
+        </button>
     );
 }

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Data\DevCardData;
 use App\Data\DevRatingData;
 use App\Data\GitHubProfileData;
+use App\Data\RatingBreakdownData;
 use App\Models\Dev;
 use App\Services\GitHub\GitHubClient;
 use Illuminate\Support\Facades\Cache;
@@ -89,6 +90,22 @@ class DevCardService
         );
 
         return DevCardData::fromDev($dev->load('languages'), $this->rankLabelFor($dev));
+    }
+
+    /**
+     * Explain a persisted dev's rating from stored raw stats — no API call.
+     */
+    public function breakdownFor(string $username): ?RatingBreakdownData
+    {
+        $dev = Dev::query()->where('username', mb_strtolower($username))->first();
+
+        if ($dev === null) {
+            return null;
+        }
+
+        $profile = GitHubProfileData::fromRawStats($dev->username, (array) $dev->raw_stats);
+
+        return $profile === null ? null : $this->ratingEngine->explain($profile);
     }
 
     private function fromPersisted(string $username): ?DevCardData

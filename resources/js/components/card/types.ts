@@ -24,6 +24,28 @@ export interface ServerCardDev extends Omit<CardDev, 'flagCss' | 'initials'> {
     specialist: boolean;
 }
 
+export interface LanguageBreakdown {
+    name: string;
+    score: number;
+    sharePct: number;
+    stars: number;
+    recent: boolean;
+}
+
+export interface RatingBreakdown {
+    contributions: number;
+    stars: number;
+    followers: number;
+    activityPct: number;
+    position: string;
+    positionRule: string;
+    languageBlend: number;
+    activityScore: number;
+    impactScore: number;
+    ovr: number;
+    languages: LanguageBreakdown[];
+}
+
 export interface CardTheme {
     isGold: boolean;
     tier: number;

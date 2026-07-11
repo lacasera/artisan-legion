@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
+ * @property array<string, mixed>|null $raw_stats
  * @property int|null $last_contribution_count
  * @property CarbonInterface|null $last_polled_at
  * @property CarbonInterface|null $last_active_at

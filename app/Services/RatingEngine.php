@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Data\DevRatingData;
 use App\Data\GitHubProfileData;
+use App\Data\LanguageBreakdownData;
 use App\Data\LanguageStatData;
+use App\Data\RatingBreakdownData;
 use Spatie\LaravelData\DataCollection;
 
 class RatingEngine
@@ -89,27 +91,94 @@ class RatingEngine
 
     public function position(GitHubProfileData $profile): string
     {
+        return $this->positionWithRule($profile)['position'];
+    }
+
+    /**
+     * @return array{position: string, rule: string}
+     */
+    public function positionWithRule(GitHubProfileData $profile): array
+    {
         if ($profile->totalContributions >= 5000) {
-            return 'ST';
+            return ['position' => 'ST', 'rule' => '5,000+ open-source contributions this year — prolific shipper'];
         }
 
         $shares = $this->categoryShares($profile);
 
         return match (true) {
-            $shares['infra'] >= 0.40 => 'GK',
-            $shares['backend'] >= 0.65 => 'CDM',
-            $shares['frontend'] >= 0.65 => 'LW',
-            $shares['breadth'] >= 4 => 'CAM',
-            $shares['backend'] > $shares['frontend'] => 'CM',
-            $shares['frontend'] > $shares['backend'] => 'RW',
-            default => 'CB',
+            $shares['infra'] >= 0.40 => ['position' => 'GK', 'rule' => '40%+ of code volume is infra — guards the deploy'],
+            $shares['backend'] >= 0.65 => ['position' => 'CDM', 'rule' => '65%+ backend volume — anchors the midfield'],
+            $shares['frontend'] >= 0.65 => ['position' => 'LW', 'rule' => '65%+ frontend volume — attacks down the wing'],
+            $shares['breadth'] >= 4 => ['position' => 'CAM', 'rule' => 'four+ languages each over 10% — breadth playmaker'],
+            $shares['backend'] > $shares['frontend'] => ['position' => 'CM', 'rule' => 'backend-leaning mix — runs the engine room'],
+            $shares['frontend'] > $shares['backend'] => ['position' => 'RW', 'rule' => 'frontend-leaning mix — width and pace'],
+            default => ['position' => 'CB', 'rule' => 'balanced mix — holds the line'],
         };
+    }
+
+    public function explain(GitHubProfileData $profile): ?RatingBreakdownData
+    {
+        if ($this->isGhost($profile)) {
+            return null;
+        }
+
+        $stats = $this->languageStats($profile);
+        $components = $this->overallComponents($profile, $stats);
+        $positioned = $this->positionWithRule($profile);
+        $totalBytes = max(1, array_sum(array_column($profile->languages, 'bytes')));
+
+        $scoresByName = [];
+        foreach ($stats as $stat) {
+            $scoresByName[$stat->name] = $stat->val;
+        }
+
+        $languages = [];
+        foreach ($profile->languages as $name => $aggregate) {
+            $label = mb_strtoupper($name);
+
+            if (! isset($scoresByName[$label])) {
+                continue;
+            }
+
+            $languages[] = new LanguageBreakdownData(
+                name: $label,
+                score: $scoresByName[$label],
+                sharePct: (int) round($aggregate['bytes'] / $totalBytes * 100),
+                stars: $aggregate['stars'],
+                recent: $aggregate['recent'],
+            );
+        }
+
+        usort($languages, fn (LanguageBreakdownData $a, LanguageBreakdownData $b) => $b->score <=> $a->score);
+
+        return new RatingBreakdownData(
+            contributions: $profile->totalContributions,
+            stars: $profile->totalStars,
+            followers: $profile->followers,
+            activityPct: (int) round($this->activityFactor($profile) * 100),
+            position: $positioned['position'],
+            positionRule: $positioned['rule'],
+            languageBlend: round($components['blend'], 1),
+            activityScore: round($components['activity'], 1),
+            impactScore: round($components['impact'], 1),
+            ovr: $components['ovr'],
+            languages: LanguageBreakdownData::collect($languages, DataCollection::class),
+        );
     }
 
     /**
      * @param  list<LanguageStatData>  $stats
      */
     private function overall(GitHubProfileData $profile, array $stats): int
+    {
+        return $this->overallComponents($profile, $stats)['ovr'];
+    }
+
+    /**
+     * @param  list<LanguageStatData>  $stats
+     * @return array{blend: float, activity: float, impact: float, ovr: int}
+     */
+    private function overallComponents(GitHubProfileData $profile, array $stats): array
     {
         $weights = array_slice([0.40, 0.25, 0.20, 0.15], 0, count($stats));
         $weightTotal = max(0.0001, array_sum($weights));
@@ -122,7 +191,12 @@ class RatingEngine
         $activity = 40 + 59 * $this->activityFactor($profile);
         $impact = 40 + 59 * min(1.0, $this->logNorm($profile->totalStars + $profile->followers * 3, 50000));
 
-        return (int) min(99, max(40, round(0.75 * $blend + 0.15 * $activity + 0.10 * $impact)));
+        return [
+            'blend' => $blend,
+            'activity' => $activity,
+            'impact' => $impact,
+            'ovr' => (int) min(99, max(40, round(0.75 * $blend + 0.15 * $activity + 0.10 * $impact))),
+        ];
     }
 
     private function anchor(GitHubProfileData $profile): float

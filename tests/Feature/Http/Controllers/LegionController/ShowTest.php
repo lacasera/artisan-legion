@@ -66,6 +66,36 @@ it('accepts_a_lowercase_legion_code', function () {
             ->where('legion.code', 'GHA'));
 });
 
+it('attaches_a_rating_breakdown_to_players_with_stored_stats', function () {
+    Dev::factory()->create([
+        'nation' => 'GHA',
+        'ovr' => 80,
+        'position' => 'CDM',
+        'username' => 'analyst',
+        'raw_stats' => [
+            'followers' => 100,
+            'contributions' => 800,
+            'stars' => 200,
+            'languages' => ['PHP' => ['bytes' => 900000, 'stars' => 200, 'recent' => true]],
+        ],
+    ]);
+
+    $this->get(route('legions.show', ['code' => 'GHA']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('legion.midfield.0.handle', 'analyst')
+            ->has('legion.midfield.0.breakdown.positionRule')
+            ->where('legion.midfield.0.breakdown.contributions', 800));
+});
+
+it('leaves_the_breakdown_null_for_players_without_stored_stats', function () {
+    Dev::factory()->create(['nation' => 'GHA', 'ovr' => 70, 'position' => 'CM', 'raw_stats' => []]);
+
+    $this->get(route('legions.show', ['code' => 'GHA']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('legion.midfield.0.breakdown', null));
+});
+
 it('counts_recent_enlistments_in_the_last_day', function () {
     Dev::factory()->create(['nation' => 'GHA', 'ovr' => 70, 'position' => 'CM']);
     Dev::factory()->create(['nation' => 'GHA', 'ovr' => 60, 'position' => 'CB', 'created_at' => now()->subDays(3)]);

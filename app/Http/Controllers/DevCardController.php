@@ -17,6 +17,7 @@ class DevCardController extends Controller
         return Inertia::render('cards/show', [
             'username' => $username,
             'dev' => $card,
+            'breakdown' => $card !== null ? $devCardService->breakdownFor($username) : null,
             'og' => [
                 'title' => $card !== null
                     ? "@{$card->handle} · OVR {$card->ovr} · Artisan Legion"

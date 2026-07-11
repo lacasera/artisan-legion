@@ -1,3 +1,5 @@
+import type { RatingBreakdown } from '@/components/card/types';
+
 export interface LegionPlayer {
     id: string;
     handle: string;
@@ -5,6 +7,7 @@ export interface LegionPlayer {
     pos: string;
     topLanguage: string;
     captain: boolean;
+    breakdown: RatingBreakdown | null;
 }
 
 export interface LegionCaptain {
@@ -48,4 +51,5 @@ export interface LegionHeaderProps {
 
 export interface PlayerChipProps {
     player: LegionPlayer;
+    onSelect?: (player: LegionPlayer) => void;
 }

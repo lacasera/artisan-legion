@@ -20,7 +20,26 @@ it('renders_the_card_page_with_the_struck_card', function () {
             ->where('dev.handle', 'taylorotwell')
             ->where('dev.nation', 'USA')
             ->missing('dev.internal_id')
+            ->where('breakdown.contributions', 3200)
+            ->where('breakdown.position', 'CDM')
+            ->has('breakdown.positionRule')
+            ->has('breakdown.languages', 4)
             ->where('og.image', route('cards.image', ['username' => 'taylorotwell'])));
+});
+
+it('omits_the_breakdown_for_a_ghost_card', function () {
+    Http::fake([
+        'api.github.com/graphql' => Http::response(githubUserResponse([
+            'contributionsCollection' => ['restrictedContributionsCount' => 0, 'contributionCalendar' => ['totalContributions' => 2]],
+            'repositories' => ['nodes' => []],
+        ])),
+    ]);
+
+    $this->get(route('cards.show', ['username' => 'ghost-account']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('dev', null)
+            ->where('breakdown', null));
 });
 
 it('renders_the_ghost_state_when_there_is_not_enough_activity', function () {

@@ -134,6 +134,43 @@ it('derives_goalkeeper_for_infra_heavy_stacks', function () {
     expect($engine->position($profile))->toBe('GK');
 });
 
+it('explains_a_rating_with_totals_shares_and_position_rule', function () {
+    $engine = new RatingEngine;
+    $profile = profileWith([
+        'PHP' => ['bytes' => 900000, 'stars' => 100, 'recent' => true],
+        'JavaScript' => ['bytes' => 100000, 'stars' => 10, 'recent' => false],
+    ], contributions: 800, stars: 110, followers: 40);
+
+    $breakdown = $engine->explain($profile);
+
+    expect($breakdown)->not->toBeNull()
+        ->and($breakdown->contributions)->toBe(800)
+        ->and($breakdown->stars)->toBe(110)
+        ->and($breakdown->followers)->toBe(40)
+        ->and($breakdown->position)->toBe('CDM')
+        ->and($breakdown->positionRule)->toContain('backend')
+        ->and($breakdown->ovr)->toBe($engine->rate($profile)->ovr)
+        ->and($breakdown->languages->toCollection())->toHaveCount(2)
+        ->and($breakdown->languages->toCollection()->sum('sharePct'))->toBe(100)
+        ->and($breakdown->languages->toCollection()->first()->name)->toBe('PHP');
+});
+
+it('explains_the_striker_rule_for_prolific_shippers', function () {
+    $engine = new RatingEngine;
+    $profile = profileWith(
+        ['PHP' => ['bytes' => 100000, 'stars' => 10, 'recent' => true]],
+        contributions: 6000,
+    );
+
+    expect($engine->explain($profile)->positionRule)->toContain('prolific shipper');
+});
+
+it('returns_no_breakdown_for_a_ghost', function () {
+    $engine = new RatingEngine;
+
+    expect($engine->explain(profileWith([])))->toBeNull();
+});
+
 it('derives_cam_for_broad_balanced_stacks', function () {
     $engine = new RatingEngine;
     $profile = profileWith([

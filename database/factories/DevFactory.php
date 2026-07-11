@@ -25,7 +25,19 @@ class DevFactory extends Factory
             'nation' => fake()->randomElement(['USA', 'GHA', 'FRA', 'IND', 'BRA']),
             'ovr' => fake()->numberBetween(40, 99),
             'position' => fake()->randomElement(['ST', 'CAM', 'CDM', 'CM', 'LW', 'RW', 'CB', 'GK']),
-            'raw_stats' => [],
+            'raw_stats' => [
+                'followers' => fake()->numberBetween(10, 5000),
+                'contributions' => fake()->numberBetween(50, 4000),
+                'stars' => fake()->numberBetween(0, 20000),
+                'languages' => collect(fake()->randomElements(['PHP', 'JavaScript', 'TypeScript', 'Python', 'Go', 'Rust'], fake()->numberBetween(2, 4)))
+                    ->mapWithKeys(fn (string $language) => [$language => [
+                        'bytes' => fake()->numberBetween(50000, 3000000),
+                        'stars' => fake()->numberBetween(0, 5000),
+                        'recent' => fake()->boolean(70),
+                    ]])
+                    ->all(),
+                'frameworks' => fake()->randomElements(['LARAVEL', 'REACT', 'VUE', 'TAILWIND'], fake()->numberBetween(0, 2)),
+            ],
             'last_refreshed_at' => now(),
         ];
     }

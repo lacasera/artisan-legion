@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\GitHubProfileData;
 use App\Data\LegionCaptainData;
 use App\Data\LegionData;
 use App\Data\LegionPlayerData;
 use App\Data\LegionSummaryData;
+use App\Data\RatingBreakdownData;
 use App\Models\Dev;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -29,6 +31,8 @@ class LegionService
     ];
 
     private const array OVERFLOW_ORDER = ['defense', 'midfield', 'attack', 'goalkeeper'];
+
+    public function __construct(private RatingEngine $ratingEngine) {}
 
     public function legionFor(string $code): ?LegionData
     {
@@ -58,7 +62,7 @@ class LegionService
             captain: LegionCaptainData::fromDev($captain),
             reserves: LegionPlayerData::collect(
                 $devs->slice(self::XI_SIZE, self::RESERVE_SIZE)->values()->map(
-                    fn (Dev $dev) => LegionPlayerData::fromDev($dev),
+                    fn (Dev $dev) => LegionPlayerData::fromDev($dev, breakdown: $this->breakdownFor($dev)),
                 ),
                 DataCollection::class,
             ),
@@ -122,7 +126,7 @@ class LegionService
                 }
             }
 
-            $rows[$row][] = LegionPlayerData::fromDev($dev, captain: $dev->is($captain));
+            $rows[$row][] = LegionPlayerData::fromDev($dev, captain: $dev->is($captain), breakdown: $this->breakdownFor($dev));
         }
 
         return [
@@ -131,6 +135,13 @@ class LegionService
             'defense' => LegionPlayerData::collect($rows['defense'], DataCollection::class),
             'goalkeeper' => LegionPlayerData::collect($rows['goalkeeper'], DataCollection::class),
         ];
+    }
+
+    private function breakdownFor(Dev $dev): ?RatingBreakdownData
+    {
+        $profile = GitHubProfileData::fromRawStats($dev->username, (array) $dev->raw_stats);
+
+        return $profile === null ? null : $this->ratingEngine->explain($profile);
     }
 
     private function naturalRow(string $position): string
