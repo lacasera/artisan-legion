@@ -14,8 +14,11 @@ interface GitHubClient
     public function fetchProfile(string $username): ?GitHubProfileData;
 
     /**
-     * Fetch only the past-year contribution total, or null when the user does not exist.
-     * Much cheaper than fetchProfile — used by the weekly-war polling loop.
+     * Fetch past-year contribution totals for many logins in a single aliased
+     * request — the weekly-war polling loop. Missing/renamed users are omitted.
+     *
+     * @param  list<string>  $logins
+     * @return array<string, int> input login => contribution count
      */
-    public function fetchContributionCount(string $username): ?int;
+    public function fetchContributionCounts(array $logins): array;
 }

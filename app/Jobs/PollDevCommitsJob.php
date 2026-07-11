@@ -8,56 +8,56 @@ use App\Models\Dev;
 use App\Services\GitHub\GitHubClient;
 use App\Services\GitHub\GitHubRateLimitedException;
 use App\Services\WeeklyWarService;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class PollDevCommitsJob implements ShouldBeUnique, ShouldQueue
+class PollDevCommitsJob implements ShouldQueue
 {
     use Queueable;
 
     public int $tries = 1;
 
-    public int $uniqueFor = 240;
-
-    public function __construct(public int $devId) {}
-
-    public function uniqueId(): string
-    {
-        return (string) $this->devId;
-    }
+    /**
+     * @param  list<int>  $devIds
+     */
+    public function __construct(public array $devIds) {}
 
     public function handle(GitHubClient $github, WeeklyWarService $weeklyWarService): void
     {
-        $dev = Dev::query()->find($this->devId);
+        $devs = Dev::query()->whereIn('id', $this->devIds)->get()->keyBy('username');
 
-        if ($dev === null) {
+        if ($devs->isEmpty()) {
             return;
         }
 
         try {
-            $current = $github->fetchContributionCount($dev->username);
+            $counts = $github->fetchContributionCounts(array_values($devs->keys()->all()));
         } catch (GitHubRateLimitedException $exception) {
             report($exception);
 
             return;
         }
 
-        if ($current === null) {
-            return;
+        foreach ($counts as $login => $current) {
+            /** @var Dev|null $dev */
+            $dev = $devs->get($login);
+
+            if ($dev === null) {
+                continue;
+            }
+
+            $baseline = $dev->last_contribution_count;
+            $delta = $baseline === null ? 0 : max(0, $current - $baseline);
+
+            $dev->last_contribution_count = max(0, $current);
+            $dev->last_polled_at = now();
+
+            if ($delta > 0) {
+                $dev->last_active_at = now();
+                $weeklyWarService->awardCommits($dev, $delta);
+            }
+
+            $dev->save();
         }
-
-        $baseline = $dev->last_contribution_count;
-        $delta = $baseline === null ? 0 : max(0, $current - $baseline);
-
-        $dev->last_contribution_count = max(0, $current);
-        $dev->last_polled_at = now();
-
-        if ($delta > 0) {
-            $dev->last_active_at = now();
-            $weeklyWarService->awardCommits($dev, $delta);
-        }
-
-        $dev->save();
     }
 }

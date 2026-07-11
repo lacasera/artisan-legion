@@ -65,19 +65,9 @@ class GraphQLGitHubClient implements GitHubClient
         'alpinejs' => 'ALPINE',
     ];
 
-    private const string CONTRIBUTIONS_QUERY = <<<'GRAPHQL'
-        query DevContributions($login: String!) {
-            user(login: $login) {
-                contributionsCollection {
-                    contributionCalendar { totalContributions }
-                }
-            }
-        }
-        GRAPHQL;
-
     public function fetchProfile(string $username): ?GitHubProfileData
     {
-        $response = $this->query(self::QUERY, $username);
+        $response = $this->execute(self::QUERY, ['login' => $username]);
 
         $user = $response->json('data.user');
 
@@ -151,17 +141,33 @@ class GraphQLGitHubClient implements GitHubClient
         return array_slice(array_keys($counts), 0, 3);
     }
 
-    public function fetchContributionCount(string $username): ?int
+    /**
+     * @param  list<string>  $logins
+     * @return array<string, int>
+     */
+    public function fetchContributionCounts(array $logins): array
     {
-        $response = $this->query(self::CONTRIBUTIONS_QUERY, $username);
-
-        $user = $response->json('data.user');
-
-        if ($user === null) {
-            return null;
+        if ($logins === []) {
+            return [];
         }
 
-        return $this->contributionCount($user);
+        $aliases = [];
+        foreach ($logins as $index => $login) {
+            $aliases[] = "u{$index}: user(login: ".json_encode($login).') { contributionsCollection { contributionCalendar { totalContributions } } }';
+        }
+
+        $response = $this->execute('query { '.implode(' ', $aliases).' }', timeout: 30);
+
+        $counts = [];
+        foreach ($logins as $index => $login) {
+            $total = $response->json("data.u{$index}.contributionsCollection.contributionCalendar.totalContributions");
+
+            if ($total !== null) {
+                $counts[$login] = (int) $total;
+            }
+        }
+
+        return $counts;
     }
 
     /**
@@ -175,25 +181,28 @@ class GraphQLGitHubClient implements GitHubClient
         return (int) data_get($user, 'contributionsCollection.contributionCalendar.totalContributions', 0);
     }
 
-    private function query(string $query, string $username): Response
+    /**
+     * @param  array<string, mixed>  $variables
+     */
+    private function execute(string $query, array $variables = [], int $timeout = 15): Response
     {
         $response = Http::withToken((string) config('services.github.token'))
-            ->timeout(15)
+            ->timeout($timeout)
             ->connectTimeout(5)
             ->retry(2, 500, fn (\Throwable $exception) => $exception instanceof ConnectionException, throw: false)
             ->post(self::ENDPOINT, [
                 'query' => $query,
-                'variables' => ['login' => $username],
+                'variables' => (object) $variables,
             ]);
 
         if ($response->status() === 403 || $response->status() === 429) {
-            throw new GitHubRateLimitedException("GitHub rate limit hit while fetching {$username}.");
+            throw new GitHubRateLimitedException('GitHub rate limit hit.');
         }
 
         $response->throw();
 
         if ($this->isRateLimitedGraphQLError($response->json('errors', []))) {
-            throw new GitHubRateLimitedException("GitHub GraphQL rate limit hit while fetching {$username}.");
+            throw new GitHubRateLimitedException('GitHub GraphQL rate limit hit.');
         }
 
         return $response;

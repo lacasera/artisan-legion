@@ -61,20 +61,29 @@ it('counts_the_full_contribution_calendar_including_opted_in_private', function 
     expect(app(GraphQLGitHubClient::class)->fetchProfile('taylorotwell')->totalContributions)->toBe(3200);
 });
 
-it('counts_the_full_contribution_calendar_when_polling_the_war', function () {
+it('fetches_many_contribution_counts_in_one_aliased_request', function () {
+    Http::preventStrayRequests();
     Http::fake([
         'api.github.com/graphql' => Http::response([
             'data' => [
-                'user' => [
-                    'contributionsCollection' => [
-                        'contributionCalendar' => ['totalContributions' => 1240],
-                    ],
-                ],
+                'u0' => ['contributionsCollection' => ['contributionCalendar' => ['totalContributions' => 1240]]],
+                'u1' => ['contributionsCollection' => ['contributionCalendar' => ['totalContributions' => 87]]],
+                'u2' => null,
             ],
         ]),
     ]);
 
-    expect(app(GraphQLGitHubClient::class)->fetchContributionCount('taylorotwell'))->toBe(1240);
+    $counts = app(GraphQLGitHubClient::class)->fetchContributionCounts(['taylorotwell', 'themsaid', 'ghost-nobody']);
+
+    expect($counts)->toBe(['taylorotwell' => 1240, 'themsaid' => 87]);
+    Http::assertSentCount(1);
+});
+
+it('returns_an_empty_map_for_no_logins', function () {
+    Http::preventStrayRequests();
+
+    expect(app(GraphQLGitHubClient::class)->fetchContributionCounts([]))->toBe([]);
+    Http::assertNothingSent();
 });
 
 it('returns_null_for_an_unknown_user', function () {

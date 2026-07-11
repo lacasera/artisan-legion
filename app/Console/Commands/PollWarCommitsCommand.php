@@ -15,24 +15,27 @@ use Illuminate\Console\Command;
 class PollWarCommitsCommand extends Command
 {
     /**
-     * Seconds between job dispatches — spreads the GraphQL budget across the
-     * scheduler window instead of bursting it.
+     * Devs per aliased GraphQL request — one request per chunk, each ~1
+     * rate-limit point. Well under GitHub's ~10s query timeout.
      */
-    private const int STAGGER_SECONDS = 2;
+    private const int CHUNK_SIZE = 500;
+
+    /**
+     * Seconds between chunk dispatches — spreads worker load across the window.
+     */
+    private const int STAGGER_SECONDS = 5;
 
     public function handle(): int
     {
-        $dispatched = 0;
+        $devIds = Dev::query()->orderBy('id')->pluck('id')->map(fn ($id): int => (int) $id)->all();
+        $chunks = array_chunk($devIds, self::CHUNK_SIZE);
 
-        Dev::query()
-            ->orderBy('id')
-            ->pluck('id')
-            ->each(function (int $devId, int $index) use (&$dispatched) {
-                PollDevCommitsJob::dispatch($devId)->delay(now()->addSeconds($index * self::STAGGER_SECONDS));
-                $dispatched++;
-            });
+        foreach ($chunks as $index => $chunk) {
+            PollDevCommitsJob::dispatch($chunk)
+                ->delay(now()->addSeconds($index * self::STAGGER_SECONDS));
+        }
 
-        $this->info("Dispatched {$dispatched} polling jobs.");
+        $this->info('Dispatched '.count($chunks).' polling jobs for '.count($devIds).' devs.');
 
         return self::SUCCESS;
     }

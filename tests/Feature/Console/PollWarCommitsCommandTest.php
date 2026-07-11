@@ -6,13 +6,17 @@ use App\Jobs\PollDevCommitsJob;
 use App\Models\Dev;
 use Illuminate\Support\Facades\Queue;
 
-it('dispatches_a_polling_job_per_dev', function () {
+it('dispatches_one_batched_job_carrying_every_dev_in_the_chunk', function () {
     Queue::fake();
-    Dev::factory()->count(3)->create();
+    $devs = Dev::factory()->count(3)->create();
 
     $this->artisan('war:poll')->assertSuccessful();
 
-    Queue::assertPushed(PollDevCommitsJob::class, 3);
+    Queue::assertPushed(PollDevCommitsJob::class, 1);
+    Queue::assertPushed(
+        PollDevCommitsJob::class,
+        fn (PollDevCommitsJob $job) => $job->devIds === $devs->pluck('id')->all(),
+    );
 });
 
 it('dispatches_nothing_when_no_devs_exist', function () {
